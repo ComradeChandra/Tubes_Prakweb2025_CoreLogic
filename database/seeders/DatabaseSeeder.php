@@ -15,16 +15,26 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. BIKIN AKUN (ADMIN)
-        // Ini akun buat Admin (ChandraHarkatRaharja) login nanti. Passwordnya: password
-        User::create([
-            'name' => 'ChandraHarkatRaharja',
+        // 1. BIKIN AKUN SUPER ADMIN (Ini akun Urg)
+        User::factory()->create([
+            'name' => 'Chandra Harkat Raharja',      // Nama asli urg biar nggak gila
+            'username' => 'admin',                   // Username buat login
             'email' => 'admin@corelogic.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('password'),    // Password default
+            
+            // --- UPDATE PENTING DI SINI ---
+            // Karena tadi di Migration urg udah nambahin kolom 'role',
+            // Di sini urg WAJIB set ini jadi 'admin'.
+            // Kalo gak diset, nanti urg cuma jadi 'customer' (default-nya).
+            'role' => 'admin', 
+            
+            // Data pelengkap (Boleh isi, boleh enggak karena nullable)
+            'phone' => '081234567890',
+            'address' => 'Markas Besar CoreLogic',
         ]);
 
         // 2. BIKIN KATEGORI LAYANAN
-        // Kita simpen ke variabel ($catCombat, dll) biar gampang dipanggil di bawah
+        // Urg simpen ke variabel ($catCombat, dll) biar ID-nya bisa dipake di bawah
         $catCombat = Category::create([
             'name' => 'Tactical Combat Unit',
             'slug' => 'tactical-combat-unit'
@@ -45,11 +55,11 @@ class DatabaseSeeder extends Seeder
             'slug' => 'static-security'
         ]);
 
-        // 3. MASUKIN UNIT PMC (BARANG DAGANGAN)
+        // 3. MASUKIN BARANG DAGANGAN (UNIT PMC)
         
         // --- EASTERN WOLVES ---
         Service::create([
-            'category_id' => $catCombat->id, // Masuk kategori Combat
+            'category_id' => $catCombat->id, // Nyambung ke kategori Combat
             'name' => 'Eastern Wolves - Platinum Package',
             'slug' => 'eastern-wolves-platinum',
             'price' => 1500.00, 
@@ -59,7 +69,7 @@ class DatabaseSeeder extends Seeder
 
         // --- BLACKGOLD TEAM ---
         Service::create([
-            'category_id' => $catCombat->id, // Masuk kategori Combat
+            'category_id' => $catCombat->id, 
             'name' => 'Blackgold Team - Gold Package',
             'slug' => 'blackgold-team-gold',
             'price' => 1200.00,
@@ -69,7 +79,7 @@ class DatabaseSeeder extends Seeder
 
         // --- K9 UNIT ---
         Service::create([
-            'category_id' => $catTraining->id, // Masuk kategori Training
+            'category_id' => $catTraining->id, 
             'name' => 'K-9 Handler & Trainer',
             'slug' => 'k9-handler-trainer',
             'price' => 450.00,
@@ -79,7 +89,7 @@ class DatabaseSeeder extends Seeder
 
         // --- ARMORED VIP ---
         Service::create([
-            'category_id' => $catTransport->id, // Masuk kategori Transport
+            'category_id' => $catTransport->id, 
             'name' => 'Armored VIP Escort (City)',
             'slug' => 'armored-vip-escort',
             'price' => 800.00,
@@ -89,17 +99,17 @@ class DatabaseSeeder extends Seeder
 
         // --- APC ESCORT ---
         Service::create([
-            'category_id' => $catTransport->id, // Masuk kategori Transport
+            'category_id' => $catTransport->id, 
             'name' => 'Heavy Cargo Escort (APC)',
             'slug' => 'heavy-cargo-escort-apc',
             'price' => 2000.00,
             'description' => 'Pengawalan barang bernilai tinggi menggunakan APC BTR/Bearcat.',
-            'status' => 'deployed', // Statusnya lagi "Sedang Tugas"
+            'status' => 'deployed', // Ceritanya lagi tugas
         ]);
 
         // --- STATSEC ---
         Service::create([
-            'category_id' => $catStatic->id, // Masuk kategori Static
+            'category_id' => $catStatic->id, 
             'name' => 'CoreLogic StatSec Unit',
             'slug' => 'corelogic-statsec',
             'price' => 150.00,
@@ -110,23 +120,23 @@ class DatabaseSeeder extends Seeder
 }
 
 /*
-========== PENJELASAN KODINGAN ==========
+========== CATATAN LOGIKA (CATATAN URG) ==========
 
-ini file buat NGISI DATA OTOMATIS (Seeder).
+Logika file Seeder ini setelah update Migration User:
 
-1. LOGIKA UTAMA:
-   urg pake perintah `Create` manual buat masukin data satu per satu.
-   Kenapa gak pake Factory? Karena data urg SPESIFIK (Eastern Wolves, Blackgold),
-   bukan data acak kayak "Lorem Ipsum".
+1. MASALAH SEBELUMNYA:
+   Tadi urg update tabel `users` nambahin kolom `role` ('admin'/'customer').
+   Default-nya database bakal ngisi 'customer' kalau gak dibilangin.
+   
+2. SOLUSI DI SINI:
+   Pas bikin user `Chandra Harkat Raharja`, urg tambahin baris:
+   'role' => 'admin',
+   
+   Kenapa? 
+   Biar pas urg login nanti, sistem tau: "Oh, ini Boss Besar".
+   Kalau baris itu lupa urg tulis, nanti urg malah dianggap tamu biasa (customer) 
+   dan gak bisa masuk Dashboard Admin yang mau urg bikin.
 
-2. ALUR KERJANYA:
-   - Pertama, urg bikin User Admin (buat urg login nanti).
-   - Kedua, urg bikin Kategori (Combat, Transport, dll) dan urg simpen ID-nya di variabel ($catCombat).
-   - Ketiga, urg bikin Service (Unit) dan urg tempelin ID Kategori tadi di kolom 'category_id'.
-
-   Jadi pas urg jalanin seeder ini, si Eastern Wolves otomatis tau kalo dia itu anak buahnya "Tactical Combat Unit".
-
-3. CARA PAKAI:
-   Save file ini, terus buka terminal dan ketik:
-   php artisan db:seed
+3. SISA KODINGAN (Category & Service):
+   Ini sama aja kayak kemaren. Cuma buat ngisi data dummy biar website gak kosong melompong.
 */
