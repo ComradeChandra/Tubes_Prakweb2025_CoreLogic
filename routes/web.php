@@ -1,12 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// Panggil Controller Auth yang tadi kita bikin
+// Panggil Controller Auth buat ngatur Login/Logout/Register
 use App\Http\Controllers\AuthController;
+// UPDATE: Panggil Model Service biar bisa ambil data Unit buat Katalog
+use App\Models\Service; 
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Web Routes - CORELOGIC DEFENSE
 |--------------------------------------------------------------------------
 |
 | Ini peta jalan aplikasi kita.
@@ -15,27 +17,34 @@ use App\Http\Controllers\AuthController;
 */
 
 // 1. HALAMAN DEPAN (LANDING PAGE)
-// Sementara urg arahin ke welcome default dulu. 
-// Nanti si Nauval yang bakal ubah ini jadi Landing Page CoreLogic.
+// UPDATE: Urg ganti arahnya ke 'layouts.welcome' (Punya Nauval).
+// Biar yang muncul desain Tentara & "Elite Protection", bukan logo Laravel biasa.
 Route::get('/', function () {
-    return view('welcome');
+    return view('layouts.welcome');
 });
 
-// 2. SISTEM AUTHENTICATION (LOGIN & REGISTER)
-// Urg kelompokkin pake 'controller' biar rapi, gak perlu ngetik [AuthController::class] berkali-kali.
+// 2. HALAMAN KATALOG (DAFTAR UNIT)
+// UPDATE: Ini rute baru buat nampilin halaman Katalog buatan Nauval.
+Route::get('/catalog', function () {
+    // Logika: Ambil semua data dari tabel 'services' di database
+    $services = Service::all();
+    
+    // Kirim datanya ke view 'catalog.blade.php' biar bisa di-looping di sana
+    return view('catalog', compact('services'));
+});
 
+// 3. SISTEM AUTHENTICATION (LOGIN & REGISTER)
+// Urg kelompokkin pake 'controller' biar rapi, gak perlu ngetik [AuthController::class] berkali-kali.
 Route::controller(AuthController::class)->group(function () {
     
     // --- HALAMAN LOGIN ---
     // URL: /login (GET)
-    // Tugas: Nampilin form login yang tadi urg desain.
-    // Nama Route: 'login' (Penting buat redirect middleware nanti)
+    // Tugas: Nampilin form login Redfor yang tadi urg desain.
     Route::get('/login', 'showLogin')->name('login');
 
     // --- PROSES LOGIN ---
     // URL: /login (POST)
-    // Tugas: Nerima data dari form, terus cek email & password.
-    // Nama Route: 'login.post' (Ini yang dipake di <form action="..."> tadi)
+    // Tugas: Nerima data dari form, terus cek email & password (Validasi).
     Route::post('/login', 'login')->name('login.post');
 
     // --- HALAMAN REGISTER ---
@@ -51,21 +60,19 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 /*
-========== CATATAN LOGIKA ROUTE (URG) ==========
+========== CATATAN LOGIKA INTEGRASI (URG) ==========
 
-1. KONSEP 'NAME':
-   Liat deh urg kasih ->name('login.post').
-   Ini semacam "Nickname" buat jalur ini.
-   Jadi di view tadi, urg cukup panggil route('login.post').
-   Kalau suatu saat urg ganti URL-nya jadi '/masuk-gan', view-nya gak perlu diedit, karena nickname-nya tetep sama.
+1. UPDATE FRONTEND NAUVAL:
+   - Rute '/' sekarang ngarah ke `view('layouts.welcome')`. Jadi pas buka web, langsung sangar.
+   - Urg tambahin rute '/catalog'. Di sini urg pake `Service::all()` buat ngambil data REAL 
+     dari database (Eastern Wolves, Blackgold, dll) yang kemaren urg seed.
 
-2. CONTROLLER GROUP:
-   Urg pake Route::controller(...) biar kodingannya ringkes.
-   Semua jalur di dalem group itu otomatis nyambung ke AuthController.
-   Jadi tinggal tulis nama fungsinya aja ('showLogin', 'login', dll).
+2. SISTEM LOGIN (BACKEND):
+   - Bagian Route::controller(AuthController::class) itu punya urg.
+   - Fungsinya buat ngatur keamanan pintu masuk (Login/Logout).
+   - Logika 'name' ('login.post') tetep dipake biar gampang dipanggil di form view.
 
-3. ERROR SAAT INI:
-   Kalau file ini di-save sekarang, pasti bakal ERROR pas dibuka.
-   Kenapa? Karena di AuthController, fungsi 'showLogin', 'login', dll BELUM ADA isinya.
-   Langkah selanjutnya: Kita harus isi otak si AuthController.
+3. PENTING:
+   File ini nge-link Frontend (Nauval) sama Backend (Urg).
+   Jadi sekarang Halaman Depan, Katalog, sama Login udah satu jalur.
 */

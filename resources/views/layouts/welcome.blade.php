@@ -4,7 +4,7 @@
 <section class="bg-gray-900 bg-[url('https://images.unsplash.com/photo-1595590424283-b8f17842773f?q=80&w=2070&auto=format&fit=crop')] bg-no-repeat bg-cover bg-center bg-blend-multiply">
     <div class="px-4 mx-auto max-w-7xl text-center py-24 lg:py-56">
         <h1 class="mb-4 text-4xl font-extrabold tracking-tight leading-none text-white md:text-5xl lg:text-6xl">
-            ELITE PROTECTION FOR A <br> <span class="text-transparent bg-clip-text bg-linear-to-r from-red-500 to-red-800">CHAOTIC WORLD</span>
+            ELITE PROTECTION FOR YOUR SAFETY <br> <span class="text-transparent bg-clip-text bg-linear-to-r from-red-500 to-red-800">CHAOTIC WORLD</span>
         </h1>
         <p class="mb-8 text-lg font-normal text-gray-300 lg:text-xl sm:px-16 lg:px-48">
             Menyediakan solusi keamanan taktis tingkat militer. Dari pengawalan VIP hingga operasi zona konflik. Keamanan Anda adalah misi mutlak kami.
