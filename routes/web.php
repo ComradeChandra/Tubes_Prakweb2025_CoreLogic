@@ -90,6 +90,12 @@ Contoh: route('admin.categories.index'), route('admin.categories.create'), dll
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
 
+    // [BARANG BARU] DASHBOARD REDIRECT 
+    // Biar kalo Admin buka '/admin' atau login, gak nyasar (404), tapi langsung masuk ke daftar Services.
+    Route::get('/admin', function() {
+        return redirect()->route('admin.services.index');
+    })->name('admin.dashboard');
+
     // ===== CRUD KATEGORI =====
     // Manage kategori unit keamanan (Combat, Transport, Training, dll)
     Route::resource('admin/categories', CategoryController::class)
@@ -106,7 +112,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 });
 
 /*
-========== CATATAN LOGIKA INTEGRASI (URG) ==========
+========== CATATAN LOGIKA INTEGRASI ==========
 
 1. UPDATE FRONTEND NAUVAL:
    - Rute '/' sekarang ngarah ke `view('layouts.welcome')`. Jadi pas buka web, langsung sangar.
@@ -133,4 +139,4 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
    Password: password
 
    Setelah login, akses: http://localhost/admin/categories atau /admin/services
-*/ 
+*/
