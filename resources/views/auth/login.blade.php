@@ -23,11 +23,11 @@
         <!-- LOGO & BRANDING -->
         <div class="mb-6 text-center">
             <!-- Judul Besar: CoreLogic -->
-            <h1 class="text-3xl font-bold tracking-wider text-white uppercase">
-                CoreLogic<span class="text-red-600">Defense Solutions</span>
+            <h1 class="text-3xl font-bold tracking-wider text-white uppercase"> 
+                CoreLogic<spaW class="text-red-600">Security Solutions</span>
             </h1>
             <!-- Subjudul: Keliatan profesional, padahal aslinya jualan jasa 'keamanan' -->
-            <p class="text-xs text-red-500 tracking-[0.3em] mt-1 font-bold">INTEGRATED DEFENSE SYSTEMS</p>
+            <p class="text-xs text-red-500 tracking-[0.3em] mt-1 font-bold">INTEGRATED SECURITY SYSTEMS</p>
         </div>
 
         <!-- KOTAK FORM LOGIN -->

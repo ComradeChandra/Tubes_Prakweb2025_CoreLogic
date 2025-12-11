@@ -36,13 +36,13 @@ class DatabaseSeeder extends Seeder
         // 2. BIKIN KATEGORI LAYANAN
         // Urg simpen ke variabel ($catCombat, dll) biar ID-nya bisa dipake di bawah
         $catCombat = Category::create([
-            'name' => 'Tactical Combat Unit',
-            'slug' => 'tactical-combat-unit'
+            'name' => 'Strategic Security Unit', // Ganti 'Tactical Combat' jadi lebih halus
+            'slug' => 'strategic-security-unit'
         ]);
 
         $catTransport = Category::create([
-            'name' => 'Secure Transport',
-            'slug' => 'secure-transport'
+            'name' => 'Logistics Security', // Ganti 'Secure Transport'
+            'slug' => 'logistics-security'
         ]);
 
         $catTraining = Category::create([
@@ -63,7 +63,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Eastern Wolves - Platinum Package',
             'slug' => 'eastern-wolves-platinum',
             'price' => 1500.00, 
-            'description' => 'Unit PMC elite bersenjata Timur (AK-12, PKM). Spesialisasi urban warfare dan heavy assault.',
+            'description' => 'Elite Private Security Unit equipped with Eastern European gear (AK-12, PKM). Specializes in Urban Security and Proactive Protection.',
             'status' => 'available',
         ]);
 
@@ -73,7 +73,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Blackgold Team - Gold Package',
             'slug' => 'blackgold-team-gold',
             'price' => 1200.00,
-            'description' => 'Unit PMC standar NATO (M4A1, Glock). Disiplin tinggi, cocok untuk pengawalan korporat.',
+            'description' => 'NATO standard Private Security Unit (M4A1, Glock). Highly disciplined, suitable for corporate escorts.',
             'status' => 'available',
         ]);
 
@@ -83,7 +83,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'K-9 Handler & Trainer',
             'slug' => 'k9-handler-trainer',
             'price' => 450.00,
-            'description' => 'Pelatih profesional dan anjing K-9 (Malinois) untuk deteksi bahan peledak.',
+            'description' => 'Professional handlers with K-9 units for hazard detection and site safety.', 
             'status' => 'available',
         ]);
 
@@ -93,8 +93,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Armored VIP Escort (City)',
             'slug' => 'armored-vip-escort',
             'price' => 800.00,
-            'description' => 'Sedan Mewah (S-Class) dengan Armor Level B6. Driver bersertifikat taktis.',
-            'status' => 'available',
+            'description' => 'Luxury sedan with B6-level protection. Certified defensive drivers.', 
         ]);
 
         // --- APC ESCORT ---

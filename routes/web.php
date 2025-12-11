@@ -58,8 +58,9 @@ Route::controller(AuthController::class)->group(function () {
     // URL: /register (POST)
     Route::post('/register', 'register')->name('register.post');
 
-    // --- LOGOUT ---
-    Route::post('/logout', 'logout')->name('logout');
+    // --- LOGOUT (UPDATE FIX 405) ---
+    // Pake 'any' biar bisa logout lewat tombol (POST) ATAU ketik URL manual (GET)
+    Route::any('/logout', 'logout')->name('logout');
 });
 
 /*
@@ -90,10 +91,10 @@ Contoh: route('admin.categories.index'), route('admin.categories.create'), dll
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
 
-    // [BARANG BARU] DASHBOARD REDIRECT 
-    // Biar kalo Admin buka '/admin' atau login, gak nyasar (404), tapi langsung masuk ke daftar Services.
+    // [UPDATE] DASHBOARD ADMIN 
+    // Mengarahkan ke view Dashboard Statistik (Bukan redirect lagi)
     Route::get('/admin', function() {
-        return redirect()->route('admin.services.index');
+        return view('admin.dashboard');
     })->name('admin.dashboard');
 
     // ===== CRUD KATEGORI =====
