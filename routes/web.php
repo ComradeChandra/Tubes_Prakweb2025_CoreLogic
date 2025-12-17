@@ -1,6 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+Route::get('/tes', function () {
+    return 'ROUTE JALAN';
+});
+
 // Panggil Controller yang dibutuhin
 // Harus dipanggil satu-satu biar jelas asalnya darimana
 use App\Http\Controllers\AuthController;
@@ -37,6 +41,18 @@ Route::get('/catalog', function () {
     // Kirim datanya ke view catalog biar bisa dilooping
     return view('catalog', compact('services'));
 });
+// 3. Halaman Detail Service (Single Service)
+Route::get('/services/{id}', function ($id) {
+    $service = Service::findOrFail($id);
+    return view('services.show', compact('service'));
+});
+
+// 4. Halaman Order Service 
+Route::get('/services/{id}/order', function ($id) {
+    $service = Service::findOrFail($id);
+    return view('services.order', compact('service'));
+});
+
 
 
 // ====================================================
