@@ -133,7 +133,7 @@ ROUTE YANG DIPAKE:
                 {{-- ===== FIELD: HARGA ===== --}}
                 <div>
                     <label for="price" class="block mb-2 text-sm font-medium text-gray-300">
-                        Harga (Rp)
+                        Price (USD)
                         <span class="text-red-500">*</span>
                     </label>
 

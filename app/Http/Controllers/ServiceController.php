@@ -386,5 +386,4 @@ class ServiceController extends Controller
     Nanti harus ditambahin middleware RoleMiddleware.
     Di web.php: ->middleware('role:admin')
 
-END OF FILE
 */

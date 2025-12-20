@@ -33,6 +33,17 @@ class DatabaseSeeder extends Seeder
             'address' => 'Markas Besar CoreLogic',
         ]);
 
+        // 1b. BIKIN AKUN CUSTOMER (Buat Test Login)
+        User::factory()->create([
+            'name' => 'Client VIP',
+            'username' => 'client',
+            'email' => 'customer@test.com', // Pake ini aja biar gampang
+            'password' => Hash::make('password'),
+            'role' => 'customer', // Role customer biasa
+            'phone' => '08987654321',
+            'address' => 'Sudirman CBD Tower',
+        ]);
+
         // 2. BIKIN KATEGORI LAYANAN
         // Urg simpen ke variabel ($catCombat, dll) biar ID-nya bisa dipake di bawah
         $catCombat = Category::create([
@@ -62,7 +73,7 @@ class DatabaseSeeder extends Seeder
             'category_id' => $catCombat->id, // Nyambung ke kategori Combat
             'name' => 'Eastern Wolves - Platinum Package',
             'slug' => 'eastern-wolves-platinum',
-            'price' => 1500.00, 
+            'price' => 25000.00, 
             'description' => 'Elite Private Security Unit equipped with Eastern European gear (AK-12, PKM). Specializes in Urban Security and Proactive Protection.',
             'status' => 'available',
         ]);
@@ -72,7 +83,7 @@ class DatabaseSeeder extends Seeder
             'category_id' => $catCombat->id, 
             'name' => 'Blackgold Team - Gold Package',
             'slug' => 'blackgold-team-gold',
-            'price' => 1200.00,
+            'price' => 18500.00,
             'description' => 'NATO standard Private Security Unit (M4A1, Glock). Highly disciplined, suitable for corporate escorts.',
             'status' => 'available',
         ]);
@@ -82,7 +93,7 @@ class DatabaseSeeder extends Seeder
             'category_id' => $catTraining->id, 
             'name' => 'K-9 Handler & Trainer',
             'slug' => 'k9-handler-trainer',
-            'price' => 450.00,
+            'price' => 2500.00,
             'description' => 'Professional handlers with K-9 units for hazard detection and site safety.', 
             'status' => 'available',
         ]);
@@ -92,7 +103,7 @@ class DatabaseSeeder extends Seeder
             'category_id' => $catTransport->id, 
             'name' => 'Armored VIP Escort (City)',
             'slug' => 'armored-vip-escort',
-            'price' => 800.00,
+            'price' => 5000.00,
             'description' => 'Luxury sedan with B6-level protection. Certified defensive drivers.', 
         ]);
 
@@ -101,7 +112,7 @@ class DatabaseSeeder extends Seeder
             'category_id' => $catTransport->id, 
             'name' => 'Heavy Cargo Escort (APC)',
             'slug' => 'heavy-cargo-escort-apc',
-            'price' => 2000.00,
+            'price' => 12000.00,
             'description' => 'Pengawalan barang bernilai tinggi menggunakan APC BTR/Bearcat.',
             'status' => 'deployed', // Ceritanya lagi tugas
         ]);
@@ -111,7 +122,7 @@ class DatabaseSeeder extends Seeder
             'category_id' => $catStatic->id, 
             'name' => 'CoreLogic StatSec Unit',
             'slug' => 'corelogic-statsec',
-            'price' => 150.00,
+            'price' => 800.00,
             'description' => 'Unit penjagaan statis untuk Bank/Gedung. Armor Ringan & Shotgun.',
             'status' => 'available',
         ]);

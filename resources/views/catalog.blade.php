@@ -4,6 +4,15 @@
 <section class="bg-gray-900 py-12">
     <div class="px-4 mx-auto max-w-7xl">
 
+        <!-- ALERT SUCCESS (Added by Chandra) -->
+        <!-- Ini bakal muncul kalo ada session 'success' dari OrderController -->
+        @if(session('success'))
+            <div class="p-4 mb-6 text-sm text-green-100 rounded-lg bg-green-800 border border-green-600" role="alert">
+                <span class="font-bold">MISSION CONFIRMED!</span> 
+                {{ session('success') }}
+            </div>
+        @endif
+
         <!-- JUDUL -->
         <div class="mx-auto max-w-screen-sm text-center mb-8 lg:mb-16">
             <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-white">
@@ -65,7 +74,7 @@
                     <!-- HARGA + TOMBOL -->
                     <div class="flex items-center justify-between">
                         <span class="text-2xl font-bold text-red-500">
-                            Rp {{ number_format($service->price, 0, ',', '.') }}
+                            $ {{ number_format($service->price, 2, '.', ',') }}
                         </span>
 
                        <a

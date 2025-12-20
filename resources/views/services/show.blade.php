@@ -16,17 +16,26 @@
         </p>
 
         <p class="text-3xl text-red-500 font-bold mb-6">
-            Rp {{ number_format($service->price, 0, ',', '.') }}
+            $ {{ number_format($service->price, 2, '.', ',') }}
         </p>
 
         <p class="text-gray-300 leading-relaxed mb-10">
             {{ $service->description }}
         </p>
 
-        <a href="/catalog"
-           class="inline-block bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg">
-            ← Back to Catalog
-        </a>
+        <div class="flex gap-4">
+            <a href="/catalog"
+               class="inline-block bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition">
+                ← Back to Catalog
+            </a>
+
+            <!-- TOMBOL HIRE NOW (Added by Chandra) -->
+            <!-- Biar user gak usah balik ke katalog dulu buat nyewa -->
+            <a href="{{ url('/services/' . $service->id . '/order') }}"
+               class="inline-block bg-red-700 hover:bg-red-800 text-white px-6 py-3 rounded-lg font-bold transition">
+                HIRE NOW
+            </a>
+        </div>
 
     </div>
 </section>

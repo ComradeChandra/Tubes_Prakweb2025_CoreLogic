@@ -11,6 +11,7 @@ use App\Http\Controllers\AuthController;
 use App\Models\Service; // Ini buat ngambil data service di halaman depan
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ServiceController; 
+use App\Http\Controllers\OrderController; // Controller baru buat handle order
 
 /*
 |--------------------------------------------------------------------------
@@ -47,14 +48,6 @@ Route::get('/services/{id}', function ($id) {
     return view('services.show', compact('service'));
 });
 
-// 4. Halaman Order Service 
-Route::get('/services/{id}/order', function ($id) {
-    $service = Service::findOrFail($id);
-    return view('services.order', compact('service'));
-});
-
-
-
 // ====================================================
 // AUTHENTICATION (LOGIN, REGISTER, LOGOUT)
 // ====================================================
@@ -78,6 +71,30 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.po
 // Pake 'any' biar bisa diakses lewat url langsung (darurat/testing)
 // Jadi kalau tombol logout error, user bisa ketik /logout di browser
 Route::any('/logout', [AuthController::class, 'logout'])->name('logout');
+
+
+// ====================================================
+// ORDER ROUTES (Perlu Login)
+// ====================================================
+Route::middleware(['auth'])->group(function () {
+    
+    // Proses Submit Order (POST)
+    // Form action di blade harus mengarah ke sini: action="{{ route('orders.store') }}"
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+
+    // 4. Halaman Order Service (DIPINDAH KE SINI BIAR GAK BISA DIAKSES GUEST)
+    // [CATATAN CHANDRA]:
+    // Dulu ini di luar middleware 'auth', jadi Guest bisa akses.
+    // Sekarang dimasukin sini biar cuma user login yang bisa buka form order.
+    Route::get('/services/{id}/order', function ($id) {
+        $service = Service::findOrFail($id);
+        return view('services.order', compact('service'));
+    });
+
+    // 5. Halaman History Order User (PRAK-14)
+    Route::get('/my-orders', [OrderController::class, 'history'])->name('orders.history');
+
+});
 
 
 // ====================================================
@@ -106,5 +123,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('admin/services', ServiceController::class)
          ->names('admin.services')
          ->except(['show']);
+
+    // --- MANAGE INCOMING ORDERS (PRAK-15) ---
+    // Admin bisa liat list order & update status (Approve/Reject)
+    Route::get('admin/orders', [OrderController::class, 'indexAdmin'])->name('admin.orders.index');
+    Route::patch('admin/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
 
 });

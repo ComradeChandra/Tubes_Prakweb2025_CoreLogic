@@ -26,7 +26,10 @@
         
         <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
             <div class="w-8 h-8 bg-red-600 rounded-sm flex items-center justify-center text-white font-bold">CL</div>
-            <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">CoreLogic <span class="text-red-600">Security & Defense Solutions</span></span>
+            <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">
+                CoreLogic 
+                <span class="text-red-600 hidden lg:inline">Security & Defense Solutions</span>
+            </span>
         </a>
         
         <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse items-center">
@@ -45,6 +48,14 @@
                             {{ Auth::user()->name }}
                         </div>
                     </div>
+
+                    {{-- Tombol My Orders (Hanya untuk User Biasa/Client) --}}
+                    @if(Auth::user()->role !== 'admin')
+                        <a href="{{ route('orders.history') }}" 
+                           class="text-gray-300 hover:text-white border border-gray-600 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-gray-700 font-medium rounded text-xs px-3 py-2 text-center tracking-widest uppercase">
+                            MY ORDERS
+                        </a>
+                    @endif
 
                     {{-- Tombol Logout --}}
                     {{-- Mengarah ke route logout yang udah kita fix di web.php --}}
@@ -69,10 +80,23 @@
         </div>
         
         <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-sticky">
-          <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-700 rounded-lg bg-gray-800 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-gray-900">
+          <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-700 rounded-lg bg-gray-800 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-gray-900 items-center">
             <li><a href="/" class="block py-2 px-3 text-white bg-red-700 md:bg-transparent md:text-red-500 md:p-0" aria-current="page">HOME</a></li>
             <li><a href="/catalog" class="block py-2 px-3 text-gray-300 hover:bg-gray-700 md:hover:bg-transparent md:hover:text-red-500 md:p-0">CATALOG</a></li>
-            <li><a href="#" class="block py-2 px-3 text-gray-300 hover:bg-gray-700 md:hover:bg-transparent md:hover:text-red-500 md:p-0">CONTACT CLIENT RELATIONS</a></li>
+            
+            {{-- TOMBOL ADMIN DASHBOARD (Moved here by Chandra) --}}
+            <li><a href="#" class="block py-2 px-3 text-gray-300 hover:bg-gray-700 md:hover:bg-transparent md:hover:text-red-500 md:p-0">CONTACT</a></li>
+
+            {{-- Masuk ke menu navigasi biar rapi dan gak bikin layout berantakan --}}
+            @auth
+                @if(Auth::user()->role === 'admin')
+                    <li>
+                        <a href="{{ route('admin.dashboard') }}" class="block py-2 px-3 text-red-500 font-bold border border-red-500 rounded hover:bg-red-900/20 md:border-0 md:hover:text-red-400 md:p-0 uppercase tracking-wider">
+                            ⚠ ADMIN PANEL
+                        </a>
+                    </li>
+                @endif
+            @endauth
           </ul>
         </div>
       </div>
