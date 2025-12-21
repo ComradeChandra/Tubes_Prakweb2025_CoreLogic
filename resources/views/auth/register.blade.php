@@ -21,8 +21,10 @@
         
         {{-- Header --}}
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-white tracking-wider">NEW PARTNER</h1>
-            <p class="text-red-500 text-sm font-semibold tracking-widest mt-1">CORPORATE REGISTRATION</p>
+            <h1 class="text-xl font-bold text-white tracking-wider uppercase">
+                CoreLogic <span class="text-red-600">Security Solutions</span>
+            </h1>
+            <p class="text-red-500 text-xs font-semibold tracking-widest mt-2">CORPORATE PARTNER REGISTRATION</p>
         </div>
 
         {{-- Form Register --}}

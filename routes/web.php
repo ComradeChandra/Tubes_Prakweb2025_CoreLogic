@@ -119,6 +119,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
          ->except(['show']); // show gak dipake karena kita gak butuh detail per kategori
 
     // --- MANAGE UNIT KEAMANAN (SERVICES) ---
+    // Route khusus buat hapus foto carousel
+    Route::delete('admin/services/image/{id}', [ServiceController::class, 'destroyImage'])->name('admin.services.image.destroy');
+
     // Ini buat CRUD data unitnya (Eastern Wolves, K9 Unit, dll)
     Route::resource('admin/services', ServiceController::class)
          ->names('admin.services')

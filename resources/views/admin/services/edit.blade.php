@@ -1,39 +1,8 @@
 {{--
-========== SERVICES EDIT - FORM EDIT UNIT KEAMANAN ==========
-
-FUNGSI FILE INI:
-Halaman admin untuk mengedit unit keamanan yang sudah ada.
-Form lengkap dengan file upload untuk update gambar unit.
-
-FITUR UTAMA:
-1. Form input nama unit (pre-filled, required)
-2. Form select kategori (pre-filled, required)
-3. Form input harga (pre-filled, required)
-4. Form textarea spesifikasi (pre-filled, required)
-5. Form file upload gambar (optional - bisa ganti atau tetap pakai lama)
-6. Preview gambar existing & preview gambar baru
-7. Validation error display (per field)
-8. Tombol Cancel & Update
-9. CSRF protection & Method spoofing (PUT)
-
-KOMPONEN:
-- Header dengan judul
-- Form card dengan 5 input fields (pre-filled)
-- Current image display + new image preview
-- Error messages di bawah setiap input
-- Action buttons (Cancel/Update)
-
-DESIGN:
-- Dark theme: bg-gray-900, text-gray-100
-- Red accent: red-600 (tombol update)
-- Form validation: red-500 (error border & text)
-- Image preview: rounded, border, comparison
-- Responsive: Mobile & Desktop
-
-ROUTE YANG DIPAKE:
-- admin.services.edit (GET) -> halaman ini (form terisi data lama)
-- admin.services.update (PUT) -> submit form (update DB + upload file)
-- admin.services.index (GET) -> redirect setelah sukses/cancel
+    Halaman Edit Unit
+    -----------------
+    Form buat update data unit.
+    Pake method PUT (spoofing) karena HTML form cuma support GET/POST.
 --}}
 
 @extends('layouts.admin')
@@ -43,46 +12,40 @@ ROUTE YANG DIPAKE:
 @section('content')
 <div class="max-w-4xl space-y-6">
 
-    {{-- ===== HEADER SECTION ===== --}}
+    {{-- Header --}}
     <div>
         <h1 class="text-2xl font-bold text-white">Edit Unit: {{ $service->name }}</h1>
         <p class="mt-1 text-sm text-gray-400">
-            Ubah informasi unit keamanan yang ditawarkan CoreLogic Defense Systems
+            Ubah informasi unit keamanan yang ditawarkan CoreLogic Security Systems
         </p>
     </div>
 
-    {{-- ===== FORM CARD ===== --}}
+    {{-- Form Card --}}
     <div class="bg-gray-800 border border-gray-700 rounded-lg shadow">
         <div class="p-6">
 
-            {{-- FORM START --}}
-            {{--
-            Form PUT ke route admin.services.update
-            - Method spoofing: @method('PUT')
-            - Enctype: multipart/form-data (untuk file upload)
-            - Route parameter: $service->id
+            {{-- 
+                Form Action ke route update
+                Jangan lupa @method('PUT')
             --}}
             <form action="{{ route('admin.services.update', $service->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PUT')
 
-                {{-- ===== FIELD: NAMA UNIT ===== --}}
+                {{-- Input Nama Unit --}}
                 <div>
                     <label for="name" class="block mb-2 text-sm font-medium text-gray-300">
                         Nama Unit
                         <span class="text-red-500">*</span>
                     </label>
 
-                    {{--
-                    Input nama unit
-                    Pre-filled dengan old('name') atau $service->name
-                    --}}
+                    {{-- Value diambil dari old input (kalo error) atau data database --}}
                     <input
                         type="text"
                         id="name"
                         name="name"
                         value="{{ old('name', $service->name) }}"
-                        placeholder="Contoh: Pasukan Elite Omega, Humvee Armor, M4 Carbine, dll"
+                        placeholder="Contoh: Personal Bodyguard, VIP Escort, Home Security, dll"
                         class="w-full px-4 py-2.5 text-sm text-gray-100 bg-gray-900 border @error('name') border-red-500 @else border-gray-600 @enderror rounded-lg focus:ring-red-500 focus:border-red-500 transition"
                         required
                     >
@@ -94,7 +57,7 @@ ROUTE YANG DIPAKE:
                     @enderror
                 </div>
 
-                {{-- ===== FIELD: KATEGORI (SELECT DROPDOWN) ===== --}}
+                {{-- Select Kategori --}}
                 <div>
                     <label for="category_id" class="block mb-2 text-sm font-medium text-gray-300">
                         Kategori
@@ -285,6 +248,63 @@ ROUTE YANG DIPAKE:
                     </div>
                 </div>
 
+                {{-- 
+                    ================================================
+                    CAROUSEL IMAGES (GALLERY) - ADDED BY CHANDRA
+                    ================================================
+                    Ini buat upload banyak foto sekaligus buat carousel di halaman detail.
+                    Biar gak cuma satu foto doang yang muncul.
+                --}}
+                <div class="border-t border-gray-700 pt-6">
+                    <label class="block mb-2 text-sm font-medium text-gray-300">
+                        Gallery / Carousel Images
+                        <span class="text-gray-500 text-xs font-normal ml-1">(Optional, bisa banyak)</span>
+                    </label>
+
+                    {{-- LIST FOTO CAROUSEL YANG UDAH ADA --}}
+                    @if($service->images->count() > 0)
+                        <div class="mb-4">
+                            <p class="mb-2 text-xs text-gray-400">Foto Gallery Saat Ini:</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                @foreach($service->images as $img)
+                                    <div class="relative group">
+                                        <img src="{{ asset('storage/' . $img->image_path) }}" class="h-24 w-full object-cover rounded border border-gray-600">
+                                        
+                                        {{-- Tombol Hapus Per Foto --}}
+                                        <button 
+                                            type="button"
+                                            onclick="deleteImage('{{ route('admin.services.image.destroy', $img->id) }}')"
+                                            class="absolute top-1 right-1 bg-red-600 text-white p-1 rounded-full hover:bg-red-700 transition opacity-0 group-hover:opacity-100"
+                                            title="Hapus Foto Ini"
+                                        >
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        </button>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- INPUT UPLOAD BANYAK FOTO --}}
+                    <input
+                        type="file"
+                        name="carousel_images[]"
+                        multiple
+                        accept="image/*"
+                        onchange="previewCarouselImages(event)"
+                        class="block w-full text-sm text-gray-300 border border-gray-600 rounded-lg cursor-pointer bg-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 file:mr-4 file:py-2 file:px-4 file:rounded-l-lg file:border-0 file:text-sm file:font-medium file:bg-gray-700 file:text-white hover:file:bg-gray-600 transition"
+                    >
+                    <p class="mt-1 text-xs text-gray-500">Bisa pilih banyak file sekaligus (Ctrl + Click). Max 2MB per file.</p>
+
+                    {{-- PREVIEW CAROUSEL BARU --}}
+                    <div id="carousel-preview-container" class="mt-4 hidden">
+                        <p class="mb-2 text-xs text-gray-400">Preview Upload Baru:</p>
+                        <div id="carousel-preview-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {{-- Preview images will be injected here by JS --}}
+                        </div>
+                    </div>
+                </div>
+
                 {{-- ===== ACTION BUTTONS ===== --}}
                 <div class="flex items-center space-x-3 pt-4 border-t border-gray-700">
 
@@ -311,6 +331,12 @@ ROUTE YANG DIPAKE:
 
         </div>
     </div>
+
+    {{-- HIDDEN FORM FOR IMAGE DELETION --}}
+    <form id="delete-image-form" action="" method="POST" class="hidden">
+        @csrf
+        @method('DELETE')
+    </form>
 
 </div>
 @endsection
@@ -360,134 +386,62 @@ function previewImage(event) {
         reader.readAsDataURL(input.files[0]);
     }
 }
+
+function previewCarouselImages(event) {
+    const input = event.target;
+    const container = document.getElementById('carousel-preview-container');
+    const grid = document.getElementById('carousel-preview-grid');
+    
+    grid.innerHTML = ''; // Clear previous previews
+
+    if (input.files && input.files.length > 0) {
+        container.classList.remove('hidden');
+        
+        Array.from(input.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'w-full h-32 object-cover rounded-lg border border-gray-600';
+                grid.appendChild(img);
+            }
+            reader.readAsDataURL(file);
+        });
+    } else {
+        container.classList.add('hidden');
+    }
+}
+
+function deleteImage(url) {
+    if(confirm('Apakah Anda yakin ingin menghapus gambar ini?')) {
+        const form = document.getElementById('delete-image-form');
+        form.action = url;
+        form.submit();
+    }
+}
 </script>
 @endpush
 
-{{--
-========== CATATAN UNTUK DEVELOPER ==========
+{{-- 
+    ============================================================================
+    CATATAN PRIBADI (CHANDRA)
+    ============================================================================
+    
+    1. FITUR BARU: MULTIPLE UPLOAD
+       - Gw tambahin input `carousel_images[]` biar bisa upload banyak file sekaligus.
+       - Pake `multiple` attribute di input file.
+       - Di controller udah di-handle pake loop `foreach`.
 
-1. DATA DARI CONTROLLER:
-   File ini expect 2 variables dari ServiceController@edit:
-   - $service -> data unit yang sedang diedit
-   - $categories -> semua kategori (untuk dropdown)
+    2. PREVIEW GAMBAR:
+       - Ada JS dikit di bawah (`previewCarouselImages`) biar admin bisa liat gambar apa aja yang mau diupload.
+       - Biar gak salah upload foto kucing lagi.
 
-   Contoh di controller:
-   public function edit(Service $service) {
-       $categories = Category::all();
-       return view('admin.services.edit', compact('service', 'categories'));
-   }
+    3. HAPUS GAMBAR:
+       - Tiap foto di galeri ada tombol silang (X) merah.
+       - Itu bakal nembak ke route `admin.services.image.destroy`.
+       - Pake `confirm()` dulu biar gak kepencet gak sengaja.
 
-2. FORM SUBMISSION:
-   Form PUT ke ServiceController@update
-   Controller harus handle validation & update (termasuk file):
-
-   public function update(Request $request, Service $service) {
-       $validated = $request->validate([
-           'name' => 'required|string|max:255',
-           'category_id' => 'required|exists:categories,id',
-           'price' => 'required|numeric|min:0',
-           'specifications' => 'required|string',
-           'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // NULLABLE!
-       ]);
-
-       // Kalau ada upload gambar baru
-       if ($request->hasFile('image')) {
-           // Hapus gambar lama
-           if ($service->image) {
-               Storage::disk('public')->delete($service->image);
-           }
-
-           // Upload gambar baru
-           $imagePath = $request->file('image')->store('services', 'public');
-           $validated['image'] = $imagePath;
-       }
-
-       $service->update($validated);
-
-       return redirect()->route('admin.services.index')
-           ->with('success', 'Unit berhasil diupdate!');
-   }
-
-3. METHOD SPOOFING:
-   @method('PUT') -> Laravel method spoofing
-   Browser cuma support GET/POST, tapi Laravel butuh PUT untuk update
-
-4. FILE UPLOAD - OPTIONAL:
-   Validation: 'image' => 'nullable|image|...'
-   - nullable -> boleh kosong (tidak wajib upload)
-   - Kalau kosong -> pakai gambar lama (tidak update field image)
-   - Kalau ada file baru -> replace gambar lama
-
-5. DELETE OLD IMAGE:
-   Sebelum upload gambar baru, hapus dulu gambar lama:
-   Storage::disk('public')->delete($service->image);
-   Cegah storage penuh karena file lama tidak terhapus
-
-6. PRE-FILLED VALUES:
-   old('field', $service->field)
-   - Kalau ada validation error -> pakai old('field')
-   - Kalau tidak ada error -> pakai $service->field
-   - Berlaku untuk semua field (name, category_id, price, specifications)
-
-7. CURRENT IMAGE DISPLAY:
-   Tampilkan gambar lama (border abu) di atas file input
-   Biar admin bisa lihat dan decide mau ganti atau tidak
-   asset('storage/' . $service->image)
-
-8. NEW IMAGE PREVIEW:
-   - Border hijau (border-green-600) -> beda dengan current image (gray)
-   - Hidden by default -> muncul setelah user pilih file
-   - Text hijau: "Gambar baru akan menggantikan..."
-
-9. SELECT PRE-SELECTED:
-   {{ old('category_id', $service->category_id) == $category->id ? 'selected' : '' }}
-   Kategori yang sekarang dipake otomatis ter-select
-
-10. VALIDATION UNIQUE (DI CONTROLLER):
-    Kalau ada field unique (misal: slug, SKU), jangan lupa exception:
-    'slug' => 'required|unique:services,slug,' . $service->id
-
-11. HASFILE CHECK:
-    $request->hasFile('image') -> cek apakah ada file yang di-upload
-    Kalau false -> skip upload, pakai gambar lama
-
-12. STORAGE DISK:
-    Storage::disk('public') -> akses storage/app/public
-    delete(), store() -> method Laravel Storage facade
-
-13. ERROR HANDLING:
-    @error('field') -> validation error per field
-    Border dinamis: red kalau error, gray kalau normal
-
-14. CONSISTENCY WITH CREATE:
-    Form edit harus konsisten dengan create:
-    - Field sama
-    - Styling sama
-    - Perbedaan: pre-filled values + optional image upload
-
-15. RESPONSIVE:
-    max-w-4xl -> limit width form
-    max-w-md -> limit width image preview
-    object-cover -> crop gambar biar proporsional
-
-16. ACCESSIBILITY:
-    - Label dengan for attribute
-    - Alt text di current & preview image
-    - Helper text (text-xs) untuk instruksi
-    - Required indicator (*)
-
-17. SECURITY:
-    - @csrf token wajib
-    - Server-side validation wajib
-    - File MIME type validation
-    - Delete old file cegah orphan files
-    - Sanitize input (Laravel otomatis)
-
-18. UX IMPROVEMENTS:
-    - Tampilkan gambar lama -> user bisa lihat sebelum ganti
-    - Preview gambar baru -> user yakin file yang dipilih benar
-    - Border color berbeda -> jelas mana lama mana baru
-    - Helper text -> instruksi jelas
-
-END OF FILE
+    4. NOTE BUAT DIRI SENDIRI:
+       - Jangan lupa jalanin `php artisan storage:link` kalo gambar gak muncul.
+       - Kalo mau nambah validasi ukuran file, cek di ServiceController.php.
 --}}

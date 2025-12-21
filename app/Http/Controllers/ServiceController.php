@@ -3,117 +3,37 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
+use App\Models\ServiceImage;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
-/*
-========== SERVICE CONTROLLER - CRUD MANAGEMENT ==========
-
-FUNGSI FILE INI:
-Controller ini khusus buat Admin kelola Unit Keamanan (Services/Units).
-Admin bisa:
-- Lihat semua unit keamanan
-- Tambah unit baru (upload foto, set harga, deskripsi, status)
-- Edit unit yang udah ada
-- Hapus unit
-- Upload dan manage foto unit
-
-KENAPA PERLU CONTROLLER INI?
-Tanpa controller ini, Admin harus masuk database manual buat nambahin unit baru.
-Dengan controller ini, Admin bisa kelola unit lewat UI web dengan form upload foto, dll.
-
-FITUR KHUSUS:
-- Upload foto unit (disimpan di storage/app/public/services)
-- Generate slug otomatis dari nama unit
-- Filter berdasarkan kategori
-- Manage status unit (available, deployed, maintenance)
-
-ROUTE YANG DIPAKE:
-GET  /admin/services         -> index()    (List semua unit)
-GET  /admin/services/create  -> create()   (Form tambah unit)
-POST /admin/services         -> store()    (Proses tambah unit + upload foto)
-GET  /admin/services/{id}/edit -> edit()   (Form edit unit)
-PUT  /admin/services/{id}    -> update()   (Proses update unit + foto)
-DELETE /admin/services/{id}  -> destroy()  (Hapus unit + foto)
-*/
-
 class ServiceController extends Controller
 {
-    /**
-     * FUNGSI: Tampilkan daftar semua unit keamanan
-     * ROUTE: GET /admin/services
-     * VIEW: admin.services.index
-     *
-     * LOGIC:
-     * 1. Ambil semua data services dari database dengan relasi category
-     * 2. Eager load category (with) buat menghindari N+1 query problem
-     * 3. Sort dari yang terbaru
-     * 4. Kirim data ke view
-     *
-     * EAGER LOADING:
-     * with('category') -> load relasi category sekaligus dalam 1 query
-     * Tanpa eager loading, setiap service akan query category sendiri (N+1 problem)
-     */
     public function index()
     {
-        // Ambil semua services dengan relasi category (eager loading)
-        // latest() -> urutkan dari yang terbaru dibuat
         $services = Service::with('category')
                           ->latest()
                           ->get();
 
-        // Kirim data ke view admin.services.index
         return view('admin.services.index', compact('services'));
     }
 
-    /**
-     * FUNGSI: Tampilkan form untuk tambah unit baru
-     * ROUTE: GET /admin/services/create
-     * VIEW: admin.services.create
-     *
-     * LOGIC:
-     * 1. Ambil semua kategori buat dropdown select
-     * 2. Kirim data categories ke view
-     * 3. View nampilin form dengan field: name, category, price, description, status, image
-     */
+    // Menampilkan form tambah unit baru
     public function create()
     {
-        // Ambil semua kategori buat dropdown
-        // orderBy('name') -> sort A-Z biar user gampang cari
+        // Ambil semua kategori buat dropdown di form
         $categories = Category::orderBy('name')->get();
 
         return view('admin.services.create', compact('categories'));
     }
 
-    /**
-     * FUNGSI: Proses simpan unit baru ke database + upload foto
-     * ROUTE: POST /admin/services
-     * REDIRECT: Kembali ke index dengan pesan sukses
-     *
-     * LOGIC:
-     * 1. Validasi semua input (name, category_id, price, description, status, image)
-     * 2. Upload foto kalau ada (simpan ke storage/app/public/services)
-     * 3. Generate slug otomatis dari name
-     * 4. Simpan data ke database
-     * 5. Redirect dengan flash message
-     *
-     * VALIDASI RULES:
-     * - name: wajib, unique, min 3 karakter
-     * - category_id: wajib, harus exist di tabel categories
-     * - price: wajib, numeric, minimal 0
-     * - description: wajib, minimal 10 karakter
-     * - status: wajib, harus salah satu dari: available, deployed, maintenance
-     * - image: opsional, harus file gambar (jpg/jpeg/png), max 2MB
-     *
-     * FILE UPLOAD:
-     * Foto disimpan di: storage/app/public/services/{filename}
-     * Filename otomatis di-generate pakai timestamp + original name
-     */
+    // Proses simpan data unit baru ke database
     public function store(Request $request)
     {
-        // STEP 1: VALIDASI INPUT
+        // 1. Validasi input dari form
+        // Pastikan nama unit unik, harga angka, dan gambar sesuai format
         $validated = $request->validate([
             'name'        => 'required|unique:services,name|min:3|max:255',
             'category_id' => 'required|exists:categories,id',
@@ -121,8 +41,9 @@ class ServiceController extends Controller
             'description' => 'required|min:10',
             'status'      => 'nullable|in:available,deployed,maintenance',
             'image'       => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048', // Max 2MB
+            'carousel_images.*' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
         ], [
-            // Custom error messages
+            // Custom error messages biar user ngerti salahnya dimana
             'name.required'        => 'Nama unit wajib diisi.',
             'name.unique'          => 'Nama unit sudah ada. Gunakan nama lain.',
             'name.min'             => 'Nama unit minimal 3 karakter.',
@@ -134,35 +55,53 @@ class ServiceController extends Controller
             'description.required' => 'Deskripsi wajib diisi.',
             'description.min'      => 'Deskripsi minimal 10 karakter.',
             'status.in'            => 'Status tidak valid.',
-            'image.image'          => 'File harus berupa gambar.',
-            'image.mimes'          => 'Format gambar harus JPG, JPEG, PNG, atau WebP.',
-            'image.max'            => 'Ukuran gambar maksimal 2MB.',
+            'image.image'          => 'File thumbnail harus berupa gambar.',
+            'image.mimes'          => 'Format thumbnail harus JPG, JPEG, PNG, atau WebP.',
+            'image.max'            => 'Ukuran thumbnail maksimal 2MB.',
+            'carousel_images.*.image' => 'File carousel harus berupa gambar.',
+            'carousel_images.*.mimes' => 'Format carousel harus JPG, JPEG, PNG, atau WebP.',
+            'carousel_images.*.max'   => 'Ukuran carousel maksimal 2MB.',
         ]);
 
-        // Set default status jika tidak diisi
+        // Default status kalau kosong = available
         if (empty($validated['status'])) {
             $validated['status'] = 'available';
         }
 
-        // STEP 2: UPLOAD FOTO (KALAU ADA)
+        // 2. Upload Thumbnail (Gambar Utama)
         if ($request->hasFile('image')) {
-            // Generate unique filename: timestamp_originalname.jpg
-            $filename = time() . '_' . $request->file('image')->getClientOriginalName();
-
-            // Simpan ke storage/app/public/services/{filename}
-            // storeAs() return path relatif: services/{filename}
+            // Sanitize filename
+            $originalName = $request->file('image')->getClientOriginalName();
+            $safeName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) . '.' . $request->file('image')->getClientOriginalExtension();
+            $filename = time() . '_' . $safeName;
+            
             $validated['image'] = $request->file('image')->storeAs('services', $filename, 'public');
         }
 
-        // STEP 3: GENERATE SLUG OTOMATIS
-        // Slug ini akan dipake di URL detail unit
-        // Contoh: "Eastern Wolves Platinum" -> "eastern-wolves-platinum"
+        // 3. Bikin Slug otomatis dari nama (contoh: "Unit Alpha" -> "unit-alpha")
         $validated['slug'] = Str::slug($validated['name']);
 
-        // STEP 4: SIMPAN KE DATABASE
-        Service::create($validated);
+        // 4. Simpan data utama ke database
+        $service = Service::create($validated);
 
-        // STEP 5: REDIRECT DENGAN FLASH MESSAGE
+        // 5. Upload Gambar Carousel (Gallery) - Loop karena bisa banyak
+        if ($request->hasFile('carousel_images')) {
+            foreach ($request->file('carousel_images') as $image) {
+                // Sanitize filename
+                $originalName = $image->getClientOriginalName();
+                $safeName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
+                $filename = time() . '_' . uniqid() . '_' . $safeName;
+                
+                $path = $image->storeAs('services/carousel', $filename, 'public');
+                
+                // Simpan path gambar ke tabel service_images
+                ServiceImage::create([
+                    'service_id' => $service->id,
+                    'image_path' => $path
+                ]);
+            }
+        }
+
         return redirect()
             ->route('admin.services.index')
             ->with('success', 'Unit keamanan berhasil ditambahkan!');
@@ -225,6 +164,7 @@ class ServiceController extends Controller
             'description' => 'required|min:10',
             'status'      => 'required|in:available,deployed,maintenance',
             'image'       => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            'carousel_images.*' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
         ], [
             'name.required'        => 'Nama unit wajib diisi.',
             'name.unique'          => 'Nama unit sudah digunakan unit lain.',
@@ -238,12 +178,15 @@ class ServiceController extends Controller
             'description.min'      => 'Deskripsi minimal 10 karakter.',
             'status.required'      => 'Status wajib dipilih.',
             'status.in'            => 'Status tidak valid.',
-            'image.image'          => 'File harus berupa gambar.',
-            'image.mimes'          => 'Format gambar harus JPG, JPEG, PNG, atau WebP.',
-            'image.max'            => 'Ukuran gambar maksimal 2MB.',
+            'image.image'          => 'File thumbnail harus berupa gambar.',
+            'image.mimes'          => 'Format thumbnail harus JPG, JPEG, PNG, atau WebP.',
+            'image.max'            => 'Ukuran thumbnail maksimal 2MB.',
+            'carousel_images.*.image' => 'File carousel harus berupa gambar.',
+            'carousel_images.*.mimes' => 'Format carousel harus JPG, JPEG, PNG, atau WebP.',
+            'carousel_images.*.max'   => 'Ukuran carousel maksimal 2MB.',
         ]);
 
-        // STEP 3: HANDLE UPLOAD FOTO BARU (KALAU ADA)
+        // STEP 3: HANDLE UPLOAD FOTO THUMBNAIL BARU (KALAU ADA)
         if ($request->hasFile('image')) {
             // HAPUS FOTO LAMA DULU (kalau ada)
             if ($service->image && Storage::disk('public')->exists($service->image)) {
@@ -251,7 +194,11 @@ class ServiceController extends Controller
             }
 
             // UPLOAD FOTO BARU
-            $filename = time() . '_' . $request->file('image')->getClientOriginalName();
+            // Sanitize filename: ganti spasi jadi dash, lowercase
+            $originalName = $request->file('image')->getClientOriginalName();
+            $safeName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) . '.' . $request->file('image')->getClientOriginalExtension();
+            $filename = time() . '_' . $safeName;
+            
             $validated['image'] = $request->file('image')->storeAs('services', $filename, 'public');
         }
 
@@ -261,7 +208,24 @@ class ServiceController extends Controller
         // STEP 5: UPDATE DATA
         $service->update($validated);
 
-        // STEP 6: REDIRECT DENGAN FLASH MESSAGE
+        // STEP 6: HANDLE UPLOAD CAROUSEL IMAGES BARU (APPEND)
+        if ($request->hasFile('carousel_images')) {
+            foreach ($request->file('carousel_images') as $image) {
+                // Sanitize filename carousel juga
+                $originalName = $image->getClientOriginalName();
+                $safeName = Str::slug(pathinfo($originalName, PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
+                $filename = time() . '_' . uniqid() . '_' . $safeName;
+                
+                $path = $image->storeAs('services/carousel', $filename, 'public');
+                
+                ServiceImage::create([
+                    'service_id' => $service->id,
+                    'image_path' => $path
+                ]);
+            }
+        }
+
+        // STEP 7: REDIRECT DENGAN FLASH MESSAGE
         return redirect()
             ->route('admin.services.index')
             ->with('success', 'Unit keamanan berhasil diperbarui!');
@@ -271,17 +235,50 @@ class ServiceController extends Controller
      * FUNGSI: Hapus unit dari database + hapus foto
      * ROUTE: DELETE /admin/services/{id}
      * REDIRECT: Kembali ke index dengan pesan sukses
-     * PARAMETER: $id (ID unit yang mau dihapus)
-     *
-     * LOGIC:
-     * 1. Cari service berdasarkan ID
-     * 2. Hapus foto dari storage (kalau ada)
-     * 3. Hapus data dari database
-     * 4. Redirect dengan flash message
-     *
-     * CLEANUP FILE:
-     * Saat service dihapus, foto di storage juga ikut dihapus
-     * Ini mencegah file sampah numpuk di server
+     * PARAMETER: $id (ID unitTHUMBNAIL DARI STORAGE (kalau ada)
+        if ($service->image && Storage::disk('public')->exists($service->image)) {
+            Storage::disk('public')->delete($service->image);
+        }
+
+        // STEP 3: HAPUS FOTO CAROUSEL DARI STORAGE
+        foreach ($service->images as $image) {
+            if (Storage::disk('public')->exists($image->image_path)) {
+                Storage::disk('public')->delete($image->image_path);
+            }
+        }
+
+        // STEP 4: HAPUS DATA DARI DATABASE
+        // Karena ada onDelete('cascade') di migration, record di service_images otomatis kehapus
+        $service->delete();
+
+        // STEP 5: REDIRECT DENGAN FLASH MESSAGE
+        return redirect()
+            ->route('admin.services.index')
+            ->with('success', 'Unit keamanan berhasil dihapus!');
+    }
+
+    /**
+     * FUNGSI: Hapus satu foto carousel
+     * ROUTE: DELETE /admin/services/image/{id}
+     */
+    public function destroyImage(string $id)
+    {
+        $image = ServiceImage::findOrFail($id);
+        
+        // Hapus file fisik
+        if (Storage::disk('public')->exists($image->image_path)) {
+            Storage::disk('public')->delete($image->image_path);
+        }
+
+        // Hapus record DB
+        $image->delete();
+
+        return back()->with('success', 'Foto carousel berhasil dihapus.');
+    }
+
+    /**
+     * FUNGSI: Hapus unit dari database + hapus foto
+     * ROUTE: DELETE /admin/services/{id}
      */
     public function destroy(string $id)
     {
@@ -304,86 +301,21 @@ class ServiceController extends Controller
 }
 
 /*
-========== CATATAN TAMBAHAN UNTUK DEVELOPER ==========
-
-1. FILE UPLOAD & STORAGE:
-   Laravel punya 2 disk storage:
-   - 'public' -> storage/app/public (bisa diakses publik via symlink)
-   - 'local'  -> storage/app (private, gak bisa diakses publik)
-
-   Foto unit disimpan di 'public' karena harus bisa ditampilkan di web.
-   Path lengkap: storage/app/public/services/{filename}
-
-   Buat akses foto dari web, harus jalanin command:
-   php artisan storage:link
-
-   Setelah itu, foto bisa diakses via URL:
-   http://localhost/storage/services/{filename}
-
-2. EAGER LOADING (N+1 PROBLEM):
-   Di method index(), urg pakai with('category')
-   Ini buat ngindarin N+1 query problem.
-
-   Tanpa eager loading:
-   - 1 query buat ambil semua services
-   - N query buat ambil category setiap service (kalau ada 100 service = 100 query!)
-
-   Dengan eager loading:
-   - 1 query buat ambil semua services
-   - 1 query buat ambil semua categories terkait
-   Total: Cuma 2 query! Lebih efisien.
-
-3. VALIDATION - UNIQUE WITH IGNORE:
-   Di method update(), urg pakai: unique:services,name,{$id}
-   Ini biar saat edit, service bisa tetap pakai name-nya sendiri.
-
-   Contoh:
-   Edit "Eastern Wolves" jadi "Eastern Wolves Platinum" -> BOLEH
-   Edit "Eastern Wolves" jadi "Blackgold Team" (yang udah ada) -> GAK BOLEH
-
-4. FILE DELETION:
-   Saat update/delete, foto lama harus dihapus dari storage.
-   Kenapa? Biar gak boros storage dengan file sampah.
-
-   Check dulu file exist dengan: Storage::disk('public')->exists($path)
-   Baru hapus dengan: Storage::disk('public')->delete($path)
-
-5. PRICE VALIDATION:
-   Rule: numeric|min:0|max:9999999999.99
-   - numeric -> harus angka (bisa desimal)
-   - min:0 -> gak boleh negatif
-   - max:9999999999.99 -> max 10 digit + 2 desimal (sesuai migration decimal(15,2))
-
-6. STATUS ENUM:
-   Rule: in:available,deployed,maintenance
-   Ini hardcode sesuai dengan enum di migration.
-   Kalau nanti tambah status baru, harus update di:
-   - Migration (enum values)
-   - Controller validation rule (in:...)
-   - View form (dropdown options)
-
-7. SLUG AUTO-GENERATION:
-   Slug dibuat otomatis dari name pakai Str::slug()
-   - Auto lowercase
-   - Auto replace spasi dengan dash (-)
-   - Auto remove special characters
-
-   Contoh: "K-9 Handler & Trainer" -> "k-9-handler-trainer"
-
-8. MASS ASSIGNMENT PROTECTION:
-   Model Service harus punya $guarded atau $fillable
-   Di model urg udah set $guarded = ['id']
-   Artinya: semua field bisa di-mass assign kecuali 'id'
-
-9. FORM ENCODING:
-   Form upload file harus pakai enctype="multipart/form-data"
-   Tanpa ini, file gak akan ke-upload.
-   Di view form, pastikan ada:
-   <form enctype="multipart/form-data">
-
-10. AUTHORIZATION (NEXT STEP):
-    Controller ini belum ada authorization check.
-    Nanti harus ditambahin middleware RoleMiddleware.
-    Di web.php: ->middleware('role:admin')
-
+    ============================================================================
+    CATATAN PRIBADI (CHANDRA)
+    ============================================================================
+    
+    1. LOGIKA CONTROLLER INI:
+       - Ini otak dari segala operasi CRUD (Create, Read, Update, Delete) layanan.
+       - Gw udah tambahin fitur upload multiple image di method `store` sama `update`.
+       - Pake loop `foreach` buat nyimpen satu-satu ke tabel `service_images`.
+    
+    2. SOAL VALIDASI:
+       - Validasi udah lumayan ketat. File harus gambar (jpg/png/webp) dan max 2MB.
+       - Kalo user bandel upload file .exe atau .php, bakal ditolak mentah-mentah.
+    
+    3. FITUR HAPUS GAMBAR:
+       - Method `destroyImage` itu khusus buat ngehapus satu foto dari galeri carousel.
+       - Method `destroy` (yang paling bawah) itu buat ngehapus SATU UNIT FULL beserta semua fotonya.
+       - Jadi kalo unit dihapus, sampah fotonya gak numpuk di server. Bersih!
 */

@@ -30,13 +30,12 @@
             <div class="bg-gray-800 rounded-lg shadow border border-gray-700 hover:border-red-600 transition duration-300">
 
                 @php
-                    $imgUrl = 'https://images.unsplash.com/photo-1542259681-d7039c3dc30e?auto=format&fit=crop&q=80&w=400';
-                    if(str_contains($service->name, 'K9')) {
-                        $imgUrl = 'https://images.unsplash.com/photo-1558287588-759089726895?auto=format&fit=crop&q=80&w=400';
-                    }
-                    if(str_contains($service->name, 'VIP')) {
-                        $imgUrl = 'https://images.unsplash.com/photo-1551843073-4a9a5b6fcd5f?auto=format&fit=crop&q=80&w=400';
-                    }
+                    // Logika Gambar:
+                    // 1. Cek apakah ada gambar thumbnail di database
+                    // 2. Kalau gak ada, pake placeholder default
+                    $imgUrl = $service->image 
+                        ? asset('storage/' . $service->image) 
+                        : 'https://via.placeholder.com/400x300?text=No+Image';
                 @endphp
 
                 <!-- GAMBAR -->

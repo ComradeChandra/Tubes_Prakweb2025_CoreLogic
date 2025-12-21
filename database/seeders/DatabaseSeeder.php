@@ -126,6 +126,21 @@ class DatabaseSeeder extends Seeder
             'description' => 'Unit penjagaan statis untuk Bank/Gedung. Armor Ringan & Shotgun.',
             'status' => 'available',
         ]);
+
+        // --- CYBER SECURITY DIVISION (NEW) ---
+        $catCyber = Category::create([
+            'name' => 'Cyber Intelligence',
+            'slug' => 'cyber-intelligence'
+        ]);
+
+        Service::create([
+            'category_id' => $catCyber->id,
+            'name' => 'Cyber Security Division',
+            'slug' => 'cyber-security-division',
+            'price' => 15000.00,
+            'description' => 'Advanced digital asset protection unit. Specializes in counter-surveillance, encrypted communication channels, and neutralizing cyber threats before they manifest physically.',
+            'status' => 'available',
+        ]);
     }
 }
 

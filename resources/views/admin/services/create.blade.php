@@ -1,39 +1,8 @@
 {{--
-========== SERVICES CREATE - FORM TAMBAH UNIT KEAMANAN BARU ==========
-
-FUNGSI FILE INI:
-Halaman admin untuk menambahkan unit keamanan baru.
-Form lengkap dengan file upload untuk gambar unit.
-
-FITUR UTAMA:
-1. Form input nama unit (required)
-2. Form select kategori (dropdown, required)
-3. Form input harga (required, numeric)
-4. Form textarea spesifikasi (required)
-5. Form file upload gambar (required, with preview)
-6. Validation error display (per field)
-7. Image preview sebelum upload
-8. Tombol Cancel & Submit
-9. CSRF protection
-
-KOMPONEN:
-- Header dengan judul
-- Form card dengan 5 input fields
-- File upload dengan live preview
-- Error messages di bawah setiap input
-- Action buttons (Cancel/Submit)
-
-DESIGN:
-- Dark theme: bg-gray-900, text-gray-100
-- Red accent: red-600 (tombol submit)
-- Form validation: red-500 (error border & text)
-- Image preview: rounded, border
-- Responsive: Mobile & Desktop
-
-ROUTE YANG DIPAKE:
-- admin.services.create (GET) -> halaman ini (form kosong)
-- admin.services.store (POST) -> submit form (save ke DB + upload file)
-- admin.services.index (GET) -> redirect setelah sukses/cancel
+    Halaman Tambah Unit Baru
+    ------------------------
+    Form buat nambahin unit dagangan baru.
+    Jangan lupa enctype="multipart/form-data" biar bisa upload gambar.
 --}}
 
 @extends('layouts.admin')
@@ -43,28 +12,26 @@ ROUTE YANG DIPAKE:
 @section('content')
 <div class="max-w-4xl space-y-6">
 
-    {{-- ===== HEADER SECTION ===== --}}
+    {{-- Header --}}
     <div>
         <h1 class="text-2xl font-bold text-white">Tambah Unit Keamanan Baru</h1>
         <p class="mt-1 text-sm text-gray-400">
-            Tambahkan unit keamanan yang ditawarkan CoreLogic Defense Systems
+            Tambahkan unit keamanan yang ditawarkan CoreLogic Security Systems
         </p>
     </div>
 
-    {{-- ===== FORM CARD ===== --}}
+    {{-- Form Card --}}
     <div class="bg-gray-800 border border-gray-700 rounded-lg shadow">
         <div class="p-6">
 
-            {{-- FORM START --}}
-            {{--
-            Form POST ke route admin.services.store
-            PENTING: enctype="multipart/form-data" wajib karena ada file upload
-            Tanpa enctype ini, file tidak akan ter-upload
+            {{-- 
+                Form Action ke route store
+                Pake enctype karena ada upload file
             --}}
             <form action="{{ route('admin.services.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
 
-                {{-- ===== FIELD: NAMA UNIT ===== --}}
+                {{-- Input Nama Unit --}}
                 <div>
                     <label for="name" class="block mb-2 text-sm font-medium text-gray-300">
                         Nama Unit
@@ -76,7 +43,7 @@ ROUTE YANG DIPAKE:
                         id="name"
                         name="name"
                         value="{{ old('name') }}"
-                        placeholder="Contoh: Pasukan Elite Omega, Humvee Armor, M4 Carbine, dll"
+                        placeholder="Contoh: Personal Bodyguard, VIP Escort, Home Security, dll"
                         class="w-full px-4 py-2.5 text-sm text-gray-100 bg-gray-900 border @error('name') border-red-500 @else border-gray-600 @enderror rounded-lg focus:ring-red-500 focus:border-red-500 transition"
                         required
                     >
@@ -88,16 +55,12 @@ ROUTE YANG DIPAKE:
                     @enderror
                 </div>
 
-                {{-- ===== FIELD: KATEGORI (SELECT DROPDOWN) ===== --}}
+                {{-- Select Kategori --}}
                 <div>
                     <label for="category_id" class="block mb-2 text-sm font-medium text-gray-300">
                         Kategori
                         <span class="text-red-500">*</span>
                     </label>
-
-                    {{--
-                    Select dropdown kategori
-                    - Loop semua kategori dari $categories (di-pass dari controller)
                     - option value -> category_id (foreign key)
                     - selected -> restore pilihan kalau ada validation error
                     --}}
@@ -213,10 +176,10 @@ ROUTE YANG DIPAKE:
                     @enderror
                 </div>
 
-                {{-- ===== FIELD: GAMBAR (FILE UPLOAD WITH PREVIEW) ===== --}}
+                {{-- ===== FIELD: THUMBNAIL (FILE UPLOAD WITH PREVIEW) ===== --}}
                 <div>
                     <label for="image" class="block mb-2 text-sm font-medium text-gray-300">
-                        Gambar Unit
+                        Thumbnail Unit (Gambar Utama)
                         <span class="text-red-500">*</span>
                     </label>
 
@@ -250,13 +213,50 @@ ROUTE YANG DIPAKE:
                     - hidden -> awalnya disembunyikan, muncul setelah ada gambar
                     --}}
                     <div id="image-preview-container" class="mt-4 hidden">
-                        <p class="mb-2 text-sm font-medium text-gray-400">Preview Gambar:</p>
+                        <p class="mb-2 text-sm font-medium text-gray-400">Preview Thumbnail:</p>
                         <img
                             id="image-preview"
                             src="#"
                             alt="Preview"
                             class="w-full max-w-md h-64 object-cover rounded-lg border-2 border-gray-600"
                         >
+                    </div>
+                </div>
+
+                {{-- ===== FIELD: CAROUSEL IMAGES (MULTIPLE UPLOAD) ===== --}}
+                <div>
+                    <label for="carousel_images" class="block mb-2 text-sm font-medium text-gray-300">
+                        Gambar Carousel (Gallery)
+                    </label>
+
+                    <input
+                        type="file"
+                        id="carousel_images"
+                        name="carousel_images[]"
+                        accept="image/*"
+                        multiple
+                        onchange="previewCarouselImages(event)"
+                        class="block w-full text-sm text-gray-300 border @error('carousel_images') border-red-500 @else border-gray-600 @enderror rounded-lg cursor-pointer bg-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 file:mr-4 file:py-2 file:px-4 file:rounded-l-lg file:border-0 file:text-sm file:font-medium file:bg-red-600 file:text-white hover:file:bg-red-700 transition"
+                    >
+
+                    <p class="mt-1 text-xs text-gray-500">Bisa pilih banyak gambar sekaligus. Format: JPG, PNG, WebP. Maksimal 2MB per gambar.</p>
+
+                    @error('carousel_images')
+                        <p class="mt-2 text-sm text-red-400">
+                            <span class="font-medium">Error:</span> {{ $message }}
+                        </p>
+                    @enderror
+                    @error('carousel_images.*')
+                        <p class="mt-2 text-sm text-red-400">
+                            <span class="font-medium">Error:</span> {{ $message }}
+                        </p>
+                    @enderror
+
+                    <div id="carousel-preview-container" class="mt-4 hidden">
+                        <p class="mb-2 text-sm font-medium text-gray-400">Preview Carousel:</p>
+                        <div id="carousel-preview-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {{-- Preview images will be injected here --}}
+                        </div>
                     </div>
                 </div>
 
@@ -335,116 +335,30 @@ function previewImage(event) {
         reader.readAsDataURL(input.files[0]);
     }
 }
+
+function previewCarouselImages(event) {
+    const input = event.target;
+    const container = document.getElementById('carousel-preview-container');
+    const grid = document.getElementById('carousel-preview-grid');
+    
+    grid.innerHTML = ''; // Clear previous previews
+
+    if (input.files && input.files.length > 0) {
+        container.classList.remove('hidden');
+        
+        Array.from(input.files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'w-full h-32 object-cover rounded-lg border border-gray-600';
+                grid.appendChild(img);
+            }
+            reader.readAsDataURL(file);
+        });
+    } else {
+        container.classList.add('hidden');
+    }
+}
 </script>
 @endpush
-
-{{--
-========== CATATAN UNTUK DEVELOPER ==========
-
-1. FORM ENCTYPE:
-   enctype="multipart/form-data" WAJIB untuk file upload
-   Tanpa ini, file tidak akan ter-upload ke server
-   Form biasa pakai enctype="application/x-www-form-urlencoded" (default)
-
-2. DATA DARI CONTROLLER:
-   File ini expect variable $categories dari ServiceController@create
-   Contoh di controller:
-
-   public function create() {
-       $categories = Category::all();
-       return view('admin.services.create', compact('categories'));
-   }
-
-3. FORM SUBMISSION:
-   Form POST ke ServiceController@store
-   Controller harus validate & save data + file:
-
-   public function store(Request $request) {
-       $validated = $request->validate([
-           'name' => 'required|string|max:255',
-           'category_id' => 'required|exists:categories,id',
-           'price' => 'required|numeric|min:0',
-           'specifications' => 'required|string',
-           'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
-       ]);
-
-       // Upload file
-       $imagePath = $request->file('image')->store('services', 'public');
-       $validated['image'] = $imagePath;
-
-       Service::create($validated);
-
-       return redirect()->route('admin.services.index')
-           ->with('success', 'Unit berhasil ditambahkan!');
-   }
-
-4. FILE UPLOAD HANDLING:
-   - $request->file('image') -> ambil file dari request
-   - ->store('services', 'public') -> simpan ke storage/app/public/services
-   - Return path: services/filename.jpg
-   - Simpan path ini ke database (bukan full URL)
-
-5. STORAGE SYMLINK:
-   Jangan lupa buat symbolic link: php artisan storage:link
-   Link: public/storage -> storage/app/public
-   Biar file bisa diakses dari browser
-
-6. IMAGE PREVIEW:
-   - FileReader API (JavaScript) -> baca file di client-side
-   - readAsDataURL() -> convert ke base64
-   - Set src img -> tampilkan preview
-   - Tidak perlu upload dulu ke server
-
-7. SELECT DROPDOWN:
-   - Loop $categories dari controller
-   - old('category_id') == $category->id -> restore pilihan kalau error
-   - option disabled selected -> placeholder "-- Pilih Kategori --"
-
-8. NUMERIC INPUT:
-   - type="number" -> cuma bisa angka
-   - min="0" -> tidak boleh negatif
-   - step="1" -> integer saja (tanpa desimal)
-
-9. VALIDATION ERRORS:
-   @error('field_name') -> cek error per field
-   Border dinamis: border-red-500 kalau error
-   Pesan error muncul di bawah input
-
-10. OLD INPUT VALUES:
-    old('name') -> restore nilai kalau validation error
-    Select: {{ old('category_id') == $category->id ? 'selected' : '' }}
-
-11. REQUIRED FIELDS:
-    - Visual: <span class="text-red-500">*</span>
-    - HTML5: required attribute
-    - Server-side: validation rules di controller (lebih penting)
-
-12. FILE INPUT STYLING:
-    file:mr-4 file:py-2 file:px-4 -> style button "Choose File"
-    file:bg-red-600 -> red background (brand color)
-    hover:file:bg-red-700 -> hover effect
-
-13. IMAGE CONSTRAINTS:
-    - accept="image/*" -> cuma terima gambar
-    - Validation: image|mimes:jpeg,png,jpg,webp|max:2048 (2MB)
-    - Rasio 16:9 recommended untuk konsistensi UI
-
-14. SECURITY:
-    - @csrf -> CSRF token wajib
-    - Server-side validation wajib (jangan cuma client-side)
-    - File validation: cek MIME type & size di controller
-    - Sanitize filename: Laravel otomatis generate random name
-
-15. ACCESSIBILITY:
-    - Label dengan for attribute
-    - Input dengan id attribute
-    - Alt text di preview image
-    - Helper text (text-xs text-gray-500)
-
-16. @push('scripts'):
-    Inject JavaScript ke stack 'scripts' di layout
-    Layout punya @stack('scripts') di bagian bawah
-    Jadi script image preview cuma load di halaman ini
-
-END OF FILE
---}}

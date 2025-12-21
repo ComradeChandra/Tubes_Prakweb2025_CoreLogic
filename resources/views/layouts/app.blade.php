@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoreLogic Defense Solutions</title>
+    <title>CoreLogic Security Solutions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet" />
     <style>
@@ -18,8 +18,8 @@
       <div class="max-w-7xl flex flex-wrap items-center justify-between mx-auto p-4">
         <a href="/" class="flex items-center space-x-3 rtl:space-x-reverse">
             <div class="w-8 h-8 bg-red-600 rounded-sm flex items-center justify-center text-white font-bold">CL</div>
-            <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">
-                CoreLogic <span class="text-red-600 hidden lg:inline">Defense</span>
+            <span class="self-center text-xl font-semibold whitespace-nowrap text-white">
+                CoreLogic <span class="text-red-600 hidden lg:inline">Security Solutions</span>
             </span>
         </a>
         
@@ -72,7 +72,7 @@
                       <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">CoreLogic</span>
                   </a>
                   <p class="text-gray-500 text-sm">
-                      Penyedia jasa keamanan swasta (PMC) terpercaya untuk aset bernilai tinggi, individu VIP, dan operasi taktis di zona konflik.
+                      Penyedia jasa keamanan profesional terpercaya untuk aset bernilai tinggi, individu VIP, dan pengamanan area khusus.
                   </p>
               </div>
               
@@ -97,42 +97,7 @@
                       <h2 class="mb-6 text-sm font-semibold text-white uppercase tracking-wider">Secure Contact</h2>
                       <ul class="text-gray-400 font-medium text-sm">
                           <li class="mb-4">Satphone: +88 1600 555 123</li>
-
-    <footer class="bg-gray-900 border-t border-red-900/50 mt-auto">
-        <div class="mx-auto w-full max-w-7xl p-4 py-6 lg:py-8">
-            <div class="md:flex md:justify-between">
-              <div class="mb-6 md:mb-0 max-w-xs">
-                  <a href="/" class="flex items-center mb-4">
-                      <div class="w-8 h-8 bg-red-600 rounded-sm flex items-center justify-center text-white font-bold mr-3">CL</div>
-                      <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">CoreLogic</span>
-                  </a>
-                  <p class="text-gray-500 text-sm">
-                      Penyedia jasa keamanan swasta (PMC) terpercaya untuk aset bernilai tinggi, individu VIP, dan operasi taktis di zona konflik.
-                  </p>
-              </div>
-              
-              <div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
-                  <div>
-                      <h2 class="mb-6 text-sm font-semibold text-white uppercase tracking-wider">Services</h2>
-                      <ul class="text-gray-400 font-medium">
-                          <li class="mb-4"><a href="/catalog" class="hover:text-red-500 transition">VIP Escort</a></li>
-                          <li class="mb-4"><a href="/catalog" class="hover:text-red-500 transition">Base Security</a></li>
-                          <li><a href="/catalog" class="hover:text-red-500 transition">K9 Units</a></li>
-                      </ul>
-                  </div>
-                  <div>
-                      <h2 class="mb-6 text-sm font-semibold text-white uppercase tracking-wider">Legal</h2>
-                      <ul class="text-gray-400 font-medium">
-                          <li class="mb-4"><a href="#" class="hover:text-red-500 transition">Privacy Policy</a></li>
-                          <li class="mb-4"><a href="#" class="hover:text-red-500 transition">Terms of Engagement</a></li>
-                          <li><a href="#" class="hover:text-red-500 transition">Liability Waiver</a></li>
-                      </ul>
-                  </div>
-                  <div>
-                      <h2 class="mb-6 text-sm font-semibold text-white uppercase tracking-wider">Secure Contact</h2>
-                      <ul class="text-gray-400 font-medium text-sm">
-                          <li class="mb-4">Satphone: +88 1600 555 123</li>
-                          <li class="mb-4">Encrypted: <span class="font-mono text-red-400">cmd@corelogic.pmc</span></li>
+                          <li class="mb-4">Encrypted: <span class="font-mono text-red-400">contact@corelogic.sec</span></li>
                           <li>Base: Sector 7, Jakarta ID</li>
                       </ul>
                   </div>
@@ -140,7 +105,7 @@
             </div>
             <hr class="my-6 border-gray-700 sm:mx-auto lg:my-8" />
             <div class="sm:flex sm:items-center sm:justify-between">
-                <span class="text-sm text-gray-500 sm:text-center">© 2025 <a href="/" class="hover:underline text-red-500">CoreLogic Defense Solutions™</a>. All Rights Reserved.</span>
+                <span class="text-sm text-gray-500 sm:text-center">© 2025 <a href="/" class="hover:underline text-red-500">CoreLogic Security Solutions™</a>. All Rights Reserved.</span>
                 <div class="flex mt-4 sm:justify-center sm:mt-0 space-x-4">
                     <span class="text-gray-600 text-xs uppercase tracking-widest border border-gray-600 px-2 py-1 rounded">Secured by 256-bit AES</span>
                 </div>

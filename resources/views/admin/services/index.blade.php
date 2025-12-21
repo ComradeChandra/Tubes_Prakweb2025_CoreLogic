@@ -60,13 +60,13 @@ DESIGN SYSTEM:
     --}}
     <div class="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-            <h1 class="text-2xl font-bold text-white">Daftar Unit Taktis</h1>
+            <h1 class="text-2xl font-bold text-white">Daftar Unit Keamanan</h1>
             <p class="mt-1 text-sm text-gray-400">
                 Kelola inventaris unit keamanan, penetapan harga, dan status operasional.
             </p>
         </div>
 
-        {{-- Tombol "Deploy New Unit" (Create) --}}
+        {{-- Tombol "Add New Unit" (Create) --}}
         <div class="mt-4 md:mt-0">
             <a href="{{ route('admin.services.create') }}" 
                class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300 transition shadow-lg shadow-red-900/50">
@@ -74,7 +74,7 @@ DESIGN SYSTEM:
                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path>
                 </svg>
-                Deploy New Unit
+                Add New Unit
             </a>
         </div>
     </div>
@@ -93,7 +93,7 @@ DESIGN SYSTEM:
                     <tr>
                         <th scope="col" class="px-6 py-3 w-12 text-center">No</th>
                         <th scope="col" class="px-6 py-3 w-24">Visual</th>
-                        <th scope="col" class="px-6 py-3">Codename Unit</th>
+                        <th scope="col" class="px-6 py-3">Nama Unit</th>
                         
                         {{-- UPDATE: Kasih lebar w-48 biar kategori lega --}}
                         <th scope="col" class="px-6 py-3 w-48">Kategori</th>

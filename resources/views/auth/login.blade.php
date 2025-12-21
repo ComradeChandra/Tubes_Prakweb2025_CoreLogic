@@ -23,8 +23,8 @@
         <!-- LOGO & BRANDING -->
         <div class="mb-6 text-center">
             <!-- Judul Besar: CoreLogic -->
-            <h1 class="text-3xl font-bold tracking-wider text-white uppercase"> 
-                CoreLogic<spaW class="text-red-600">Security Solutions</span>
+            <h1 class="text-2xl font-bold tracking-wider text-white uppercase"> 
+                CoreLogic <span class="text-red-600">Security Solutions</span>
             </h1>
             <!-- Subjudul: Keliatan profesional, padahal aslinya jualan jasa 'keamanan' -->
             <p class="text-xs text-red-500 tracking-[0.3em] mt-1 font-bold">INTEGRATED SECURITY SYSTEMS</p>
@@ -119,7 +119,7 @@
 ========== CATATAN PRIBADI (JANGAN DIHAPUS BIAR GAK LUPA) ==========
 
 Ini halaman LOGIN. Urg desain biar keliatan "Corporate" tapi agak gelap (Dark Mode).
-Biar kerasa kalau ini perusahaan serius (isinya jualan jasa PMC/Mercenary).
+Biar kerasa kalau ini perusahaan serius (isinya jualan jasa Keamanan Profesional).
 
 1. KENAPA PAKE 'login_identifier'?
    Di form input, urg kasih name="login_identifier" BUKAN "email".
