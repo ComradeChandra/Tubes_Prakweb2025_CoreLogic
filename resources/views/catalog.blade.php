@@ -59,14 +59,18 @@
 
                     <!-- STATUS -->
                     <p class="mt-3 mb-4 font-light text-gray-400 text-sm">
-                        Status:
-                        <span class="
-                            @if($service->status === 'available') text-green-400
-                            @elseif($service->status === 'deployed') text-yellow-400
-                            @else text-gray-400
-                            @endif
-                            font-bold
-                        ">
+                       Status: 
+                         @php
+                            $statusColor = 'text-gray-500'; // Default warna (misal: maintenance)
+                            
+                            if($service->status === 'available') {
+                                $statusColor = 'text-green-500';
+                            } elseif($service->status === 'deployed') {
+                                $statusColor = 'text-yellow-500';
+                            }
+                        @endphp
+
+                        <span class="{{ $statusColor }} font-bold">
                             {{ strtoupper($service->status) }}
                         </span>
                     </p>
