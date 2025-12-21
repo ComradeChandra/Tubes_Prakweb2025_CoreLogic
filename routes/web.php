@@ -12,6 +12,7 @@ use App\Models\Service; // Ini buat ngambil data service di halaman depan
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ServiceController; 
 use App\Http\Controllers\OrderController; // Controller baru buat handle order
+use App\Http\Controllers\AdminController; // Controller Dashboard Admin
 
 /*
 |--------------------------------------------------------------------------
@@ -107,9 +108,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     // Halaman Utama Admin (Dashboard)
     // Nampilin ringkasan data / overview
-    Route::get('/admin', function() {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
     // --- MANAGE KATEGORI UNIT ---
     // Pake resource biar otomatis dapet index, create, store, edit, update, destroy

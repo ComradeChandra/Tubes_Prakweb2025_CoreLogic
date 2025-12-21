@@ -43,7 +43,7 @@
                 <p class="text-sm text-gray-400">Total Active Services</p>
                 {{-- LOGIKA: Hitung total baris di tabel services --}}
                 <p class="text-2xl font-bold text-white">
-                    {{ \App\Models\Service::count() }}
+                    {{ $totalServices }}
                 </p>
             </div>
         </div>
@@ -57,7 +57,7 @@
                 <p class="text-sm text-gray-400">Service Categories</p>
                 {{-- LOGIKA: Hitung total baris di tabel categories --}}
                 <p class="text-2xl font-bold text-white">
-                    {{ \App\Models\Category::count() }}
+                    {{ $totalCategories }}
                 </p>
             </div>
         </div>
@@ -71,7 +71,7 @@
                 <p class="text-sm text-gray-400">Pending Orders</p>
                 {{-- LOGIKA: Hitung order yang statusnya PENDING --}}
                 <p class="text-2xl font-bold text-white">
-                    {{ \App\Models\Order::where('status', 'PENDING')->count() }}
+                    {{ $pendingOrders }}
                 </p>
             </div>
         </div>
@@ -120,11 +120,8 @@
    Urg sengaja pisahin dari halaman tabel (CRUD) biar Admin dapet ringkasan data dulu (Overview).
 
 2. LOGIKA DATA STATISTIK:
-   Di sini urg pake cara `\App\Models\Service::count()` langsung di dalam View.
-   Kenapa gak lewat Controller?
-   - Karena dashboard ini rutenya simple (Closure Route di web.php).
-   - Datanya cuma butuh angka total (Count), jadi query-nya enteng.
-   - Lebih praktis daripada bikin Controller baru cuma buat 2 baris kode hitung.
+   Data statistik (Total Services, Categories, Pending Orders) dikirim dari AdminController.
+   Ini lebih clean daripada query langsung di View.
 
 3. STRUKTUR & DESAIN:
    - Layout pake Grid (1 kolom di HP, 3 kolom di Desktop).
