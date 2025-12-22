@@ -7,7 +7,9 @@ use App\Http\Controllers\AuthController;
 use App\Models\Service;
 // CRUD Admin Controllers
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ServiceController; 
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\OrderController; // Controller baru buat handle order
+use App\Http\Controllers\DashboardController; // Controller khusus Dashboard Admin
 
 /*
 |--------------------------------------------------------------------------
@@ -90,8 +92,13 @@ Contoh: route('admin.categories.index'), route('admin.categories.create'), dll
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
 
-    // ===== CRUD KATEGORI =====
-    // Manage kategori unit keamanan (Combat, Transport, Training, dll)
+    // Halaman Utama Admin (Dashboard)
+    // Nampilin ringkasan data / overview dengan stats keuangan
+    Route::get('/admin', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+    // --- MANAGE KATEGORI UNIT ---
+    // Pake resource biar otomatis dapet index, create, store, edit, update, destroy
+    // Ini buat ngatur kategori kayak: Combat, Transport, Guard, dll
     Route::resource('admin/categories', CategoryController::class)
          ->names('admin.categories')
          ->except(['show']); // Gak pakai show() karena list udah cukup
