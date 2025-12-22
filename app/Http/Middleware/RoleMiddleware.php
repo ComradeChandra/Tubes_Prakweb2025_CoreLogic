@@ -5,44 +5,19 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 /*
-========== ROLE MIDDLEWARE - AUTHORIZATION ==========
+========== CATATAN BUAT NAUVAL & TIM (JANGAN DIHAPUS) ==========
 
-FUNGSI FILE INI:
-Middleware ini buat ngecek apakah user punya role/permission tertentu.
-Contoh: Cuma user dengan role 'admin' yang boleh akses halaman admin.
+Ini middleware buatan urg buat ngejagain halaman Admin.
+Logikanya simpel: Cuma ngecek kolom 'role' di tabel users.
 
-CARA KERJA:
-1. User login -> Auth::user() ada datanya
-2. Middleware cek role user cocok gak dengan role yang diminta
-3. Kalau cocok -> lanjut ke controller
-4. Kalau gak cocok -> redirect dengan error message
+Kalau role-nya 'admin', boleh masuk ($next).
+Kalau bukan (misal 'customer'), langsung urg tendang pake error 403.
 
-KENAPA PERLU MIDDLEWARE INI?
-Tanpa middleware ini, SEMUA user yang udah login bisa akses halaman admin.
-Customer bisa hapus kategori, staff bisa edit harga, dll -> BAHAYA!
-Dengan middleware ini, cuma admin yang bisa akses admin panel.
-
-CARA PAKAI:
-Di routes/web.php, tambahkan middleware ke route:
-
-Contoh 1: Cuma admin yang boleh akses
-Route::get('/admin/categories', [CategoryController::class, 'index'])
-     ->middleware('auth', 'role:admin');
-
-Contoh 2: Admin atau staff yang boleh akses
-Route::get('/admin/reports', [ReportController::class, 'index'])
-     ->middleware('auth', 'role:admin,staff');
-
-PARAMETER:
-- $roles: String atau array role yang diizinkan
-  Contoh: 'admin' atau 'admin,staff' atau ['admin', 'staff']
-
-SECURITY NOTE:
-Middleware ini harus dipake SETELAH middleware 'auth'
-Urutan penting: auth -> role
-Kenapa? Karena Auth::user() baru ada SETELAH middleware auth dijalankan
+Sengaja gak pake package permission kayak Spatie biar ringan & gak ribet config-nya.
+Jadi kalau mau nambah role baru, tinggal tambahin logic di sini aja.
 */
 
 class RoleMiddleware
@@ -50,65 +25,40 @@ class RoleMiddleware
     /**
      * Handle an incoming request.
      *
-     * LOGIC:
-     * 1. Cek user udah login atau belum (via Auth::check())
-     * 2. Cek role user cocok gak dengan $roles yang diminta
-     * 3. Kalau gak cocok -> abort 403 (Forbidden)
-     * 4. Kalau cocok -> next($request) lanjut ke controller
-     *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string  ...$roles  Satu atau lebih role yang diizinkan (contoh: 'admin', 'staff')
      */
-    public function handle(Request $request, Closure $next, string ...$roles): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // STEP 1: CEK USER SUDAH LOGIN ATAU BELUM
-        // Kalau belum login, redirect ke halaman login
-        // Sebenarnya ini redundan karena harusnya udah dipake middleware 'auth' sebelumnya
-        // Tapi urg tambahin buat double safety
-        if (!auth()->check()) {
-            return redirect()->route('login')
-                           ->with('error', 'Silakan login terlebih dahulu.');
+        // 1. CEK LOGIN DULU
+        // Auth::check() -> mastiin user udah login atau belum.
+        if (! Auth::check()) {
+            return redirect('login');
         }
 
-        // STEP 2: AMBIL DATA USER YANG LOGIN
-        $user = auth()->user();
+        // 2. AMBIL DATA USER
+        $user = Auth::user();
 
-        // STEP 3: CEK ROLE USER COCOK GAK DENGAN ROLE YANG DIMINTA
-        // in_array() -> cek apakah role user ada di dalam array $roles
-        //
-        // Contoh:
-        // User role: 'admin'
-        // $roles: ['admin', 'staff']
-        // Hasil: TRUE (admin ada di array) -> BOLEH AKSES
-        //
-        // User role: 'customer'
-        // $roles: ['admin', 'staff']
-        // Hasil: FALSE (customer gak ada di array) -> GAK BOLEH AKSES
-        if (!in_array($user->role, $roles)) {
-            // Kalau role gak cocok, abort dengan HTTP 403 Forbidden
-            // 403 = Forbidden (server paham requestnya, tapi gak dikasih izin)
-            //
-            // Urg bisa custom pesan error atau redirect ke halaman custom 403
-            // Sekarang pake abort() default Laravel (akan muncul halaman 403 bawaan)
-            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
-
-            // ALTERNATIVE: Redirect ke halaman tertentu dengan pesan error
-            // return redirect()->route('home')
-            //              ->with('error', 'Anda tidak memiliki akses ke halaman ini.');
+        // 3. LOGIKA PENGECEKAN ROLE (INTI DARI FILE INI)
+        // $roles itu parameter yang dikirim dari route (misal: 'admin').
+        // Fungsi in_array ngecek: "Apakah role si user ada di daftar role yang dibolehin?"
+        if (in_array($user->role, $roles)) {
+            // Kalau COCOK -> Silakan lewat (Lanjut ke Controller)
+            return $next($request);
         }
 
-        // STEP 4: KALAU SEMUA CEK LOLOS, LANJUT KE CONTROLLER
-        return $next($request);
+        // 4. KALAU GAK COCOK -> TENDANG
+        // Abort 403 artinya "Forbidden" (Dilarang Masuk).
+        abort(403, 'Maaf, Anda tidak punya akses ke halaman ini (Bukan Admin).');
     }
 }
 
 /*
-========== CATATAN TAMBAHAN UNTUK DEVELOPER ==========
+========== CATATAN TAMBAHAN  ==========
 
 1. REGISTRASI MIDDLEWARE:
    Middleware ini harus didaftarkan dulu di bootstrap/app.php atau App\Http\Kernel.php (tergantung versi Laravel).
 
-   Di Laravel 11/12 (yang kau pakai), tambahkan di bootstrap/app.php:
+   Di Laravel 11/12, tambahkan di bootstrap/app.php:
    ->withMiddleware(function (Middleware $middleware) {
        $middleware->alias([
            'role' => \App\Http\Middleware\RoleMiddleware::class,

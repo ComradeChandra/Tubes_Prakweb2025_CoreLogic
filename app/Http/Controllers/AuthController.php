@@ -3,126 +3,128 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // Ini Facade buat ngurusin Login/Logout
-use App\Models\User; // Panggil Model User buat register nanti
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    /**
-     * TAMPILIN HALAMAN LOGIN
-     * URL: /login (GET)
-     */
+    // TAMPILIN HALAMAN LOGIN
     public function showLogin()
     {
-        // Urg arahin ke file view yang tadi kita desain
-        // Lokasi: resources/views/auth/login.blade.php
         return view('auth.login');
     }
 
-    /**
-     * PROSES LOGIN (LOGIKA UTAMA)
-     * URL: /login (POST)
-     */
+    // PROSES LOGIN
     public function login(Request $request)
     {
-        // 1. VALIDASI INPUT
-        // Urg pastiin user ngisi kolomnya. Gak boleh kosong.
-        $credentials = $request->validate([
-            'login_identifier' => ['required', 'string'], // Bisa Email atau Username
-            'password' => ['required'],
+        // 1. Validasi dulu biar gak error
+        // Cek inputan user, gak boleh kosong
+        $request->validate([
+            'login_identifier' => 'required',
+            'password' => 'required'
         ]);
 
-        // 2. CEK TIPE INPUT (Email atau Username?)
-        // Ini logika pinter yang urg janjiin tadi.
-        // filter_var ngecek: "Ini format email bukan?"
-        // Kalau iya -> set jadi 'email'. Kalau bukan -> set jadi 'username'.
-        $fieldType = filter_var($request->login_identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        // 2. Cek ini Email atau Username?
+        // Pake str_contains aja biar gampang dipahami.
+        // Logikanya: Kalo ada keong (@) berarti dia masukin email.
+        // Kalo gak ada @ nya, ya berarti itu username. 
+        
+        $input = $request->login_identifier;
+        
+        if (str_contains($input, '@')) {
+            // Ada @ nya, berarti email
+            $fieldType = 'email';
+        } else {
+            // Gak ada @, berarti username
+            $fieldType = 'username';
+        }
 
-        // 3. COBA LOGIN (AUTH ATTEMPT)
-        // Kita gabungin data loginnya
-        $authData = [
-            $fieldType => $request->login_identifier,
+        // 3. Coba login (Auth Attempt)
+        // Kita gabungin data loginnya buat dicek sama Laravel
+        $credentials = [
+            $fieldType => $input,
             'password' => $request->password
         ];
 
-        // Auth::attempt bakal otomatis ngecek ke database + hash passwordnya cocok gak.
-        // $request->filled('remember') itu ngecek checkbox "Remember Me" dicentang gak.
-        if (Auth::attempt($authData, $request->filled('remember'))) {
+        if (Auth::attempt($credentials)) {
+            // Kalo sukses login:
             
-            // Kalau Sukses:
-            
-            // a. Regenerate Session ID (Biar aman dari serangan Session Fixation)
+            // Regenerate session biar aman dari hacker
             $request->session()->regenerate();
 
-            // b. Cek Role (Sistem Kasta)
-            // Kalau Admin/Staff -> Masuk Dashboard (Nanti kita bikin)
-            // Kalau Customer -> Masuk Halaman Utama
-            // Sementara urg arahin semua ke '/' dulu sampe Dashboard jadi.
-            return redirect()->intended('/');
+            // Cek role user, kalo admin lempar ke dashboard admin
+            if (Auth::user()->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+
+            // Kalo user biasa (customer), lempar ke home aja
+            return redirect('/');
         }
 
-        // 4. KALAU GAGAL
-        // Balikin ke halaman login, bawa pesan error.
-        // withInput() biar email yang dia ketik gak ilang.
+        // Kalo gagal login (password salah atau user gak ada)
+        // Balikin lagi ke halaman login
         return back()->withErrors([
-            'login_identifier' => 'The provided credentials do not match our records.',
-        ])->onlyInput('login_identifier');
+            'login_identifier' => 'Password atau Akun salah bro, coba lagi.',
+        ]);
     }
 
-    /**
-     * PROSES LOGOUT
-     * URL: /logout (POST)
-     */
-    public function logout(Request $request)
-    {
-        Auth::logout(); // Hapus sesi login
-
-        $request->session()->invalidate(); // Matikan session
-        $request->session()->regenerateToken(); // Generate ulang token CSRF
-
-        // Tendang balik ke halaman login
-        return redirect('/login');
-    }
-
-    // --- FITUR REGISTER (AKAN DATANG) ---
-    // Urg siapin func-nya kosong dulu biar Route web.php gak error.
-    
+    // TAMPILIN HALAMAN REGISTER
     public function showRegister()
     {
-        // Nanti kita bikin view: resources/views/auth/register.blade.php
-        return view('auth.register'); 
+        return view('auth.register');
     }
 
+    // PROSES REGISTER
     public function register(Request $request)
     {
-        // Nanti diisi logika simpen user baru
-        dd('Fitur Register belum dikoding, sabar ya.');
+        // Validasi manual satu-satu
+        $request->validate([
+            'name' => 'required|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8|confirmed' // confirmed biar ngecek password sama confirm_password sama
+        ]);
+
+        // Bikin username otomatis (Soalnya di database wajib ada kolom username)
+        // Kita ambil dari nama depan email terus tambahin angka random.
+        // Pake titik (.) buat gabungin string (belajar dari PHP dasar wkwk)
+        
+        $emailParts = explode('@', $request->email);
+        $namaDepan = $emailParts[0]; 
+        $angkaRandom = rand(100, 999);
+        
+        // Gabungin jadi username: contoh "chandra.123"
+        $usernameJadi = $namaDepan . "." . $angkaRandom;
+
+        // Simpan ke database
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'username' => $usernameJadi,
+            'password' => Hash::make($request->password), // Jangan lupa di-hash!
+            'role' => 'customer' // Default user biasa
+        ]);
+
+        // Langsung login aja biar cepet, gak usah suruh login ulang
+        $credentials = [
+            'email' => $request->email,
+            'password' => $request->password
+        ];
+        
+        Auth::attempt($credentials);
+
+        return redirect('/')->with('success', 'Mantap, udah terdaftar!');
+    }
+
+    // LOGOUT
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        
+        // Bersihin session
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        
+        return redirect('/');
     }
 }
-
-/*
-========== CATATAN LOGIKA (URG) ==========
-
-Ini otak dari sistem keamanan CoreLogic.
-
-1. LOGIKA 'LOGIN IDENTIFIER':
-   Di function login(), urg pake trik `filter_var`.
-   Ini ngebuat user bebas mau login pake Username ("admin") atau Email ("admin@corelogic.com").
-   Sistem bakal otomatis tau itu apa, terus dicocokin ke database.
-
-2. AUTH::ATTEMPT:
-   Ini fungsi ajaib Laravel. Urg gak perlu ribet nge-hash password manual buat nyocokin.
-   Dia otomatis ngambil password inputan -> di-hash -> dibandingin sama password di database.
-   Kalau cocok return TRUE, kalau salah return FALSE.
-
-3. SECURITY (SESSION REGENERATE):
-   Pas user berhasil login, urg panggil `$request->session()->regenerate()`.
-   Ini WAJIB buat keamanan. Biar session ID yang lama diganti baru, 
-   jadi hacker gak bisa nyuri sesi user (Session Hijacking).
-
-4. REDIRECT:
-   Sekarang urg set `return redirect()->intended('/')`.
-   Artinya kalau sukses, bawa ke Halaman Depan.
-   Nanti kalau Dashboard Admin udah jadi, urg bakal ubah ini pake logika:
-   "Kalau Role == Admin -> ke Dashboard".
-*/

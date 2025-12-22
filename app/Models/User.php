@@ -21,6 +21,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        // Update: Perlu nambahin 'username' di sini karena logic register sekarang auto-generate username.
+        // Kalau gak dimasukin, Laravel bakal nge-drop datanya sebelum masuk DB (Mass Assignment Protection).
+        'username',
+        // Update: 'role' juga wajib masuk fillable biar kita bisa set user sebagai 'admin' atau 'customer'.
+        'role',
     ];
 
     /**
