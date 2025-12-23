@@ -25,7 +25,7 @@
 
         <!-- FORM ORDER (UPDATED BY CHANDRA) -->
         <!-- Action ngarah ke route 'orders.store' buat diproses Backend -->
-        <form action="{{ route('orders.store') }}" method="POST" class="max-w-md mx-auto bg-gray-800 p-6 rounded-lg border border-gray-700">
+        <form action="{{ route('orders.store', $service->id) }}" method="POST" class="max-w-md mx-auto bg-gray-800 p-6 rounded-lg border border-gray-700">
             @csrf <!-- Token Keamanan Wajib -->
             
             <!-- ID Service (Hidden) biar backend tau unit apa yg dibeli -->
