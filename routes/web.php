@@ -41,7 +41,7 @@ Route::get('/catalog', function () {
 // 3. SISTEM AUTHENTICATION (LOGIN & REGISTER)
 // Urg kelompokkin pake 'controller' biar rapi, gak perlu ngetik [AuthController::class] berkali-kali.
 Route::controller(AuthController::class)->group(function () {
-    
+
     // --- HALAMAN LOGIN ---
     // URL: /login (GET)
     // Tugas: Nampilin form login Redfor yang tadi urg desain.
@@ -62,6 +62,28 @@ Route::controller(AuthController::class)->group(function () {
 
     // --- LOGOUT ---
     Route::post('/logout', 'logout')->name('logout');
+});
+
+// 4. ROUTES UNTUK USER YANG SUDAH LOGIN
+// Protected routes - harus login dulu
+Route::middleware(['auth'])->group(function () {
+
+    // Detail Service & Form Order
+    Route::get('/services/{id}', function($id) {
+        $service = Service::findOrFail($id);
+        return view('services.show', compact('service'));
+    })->name('services.show');
+
+    Route::get('/services/{id}/order', function($id) {
+        $service = Service::findOrFail($id);
+        return view('services.order', compact('service'));
+    })->name('services.order');
+
+    Route::post('/services/{id}/order', [OrderController::class, 'store'])->name('orders.store');
+
+    // Halaman History Order User
+    Route::get('/my-orders', [OrderController::class, 'history'])->name('orders.history');
+
 });
 
 /*
@@ -106,9 +128,18 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // ===== CRUD SERVICES (UNIT KEAMANAN) =====
     // Manage unit keamanan individual (Eastern Wolves, K9, dll)
     // Include upload foto, set harga, deskripsi, status
+
+    // Route khusus buat hapus foto carousel
+    Route::delete('admin/services/image/{id}', [ServiceController::class, 'destroyImage'])->name('admin.services.image.destroy');
+
     Route::resource('admin/services', ServiceController::class)
          ->names('admin.services')
          ->except(['show']); // Gak pakai show() karena list udah cukup
+
+    // ===== MANAGE INCOMING ORDERS =====
+    // Admin bisa liat list order & update status (Approve/Reject)
+    Route::get('admin/orders', [OrderController::class, 'indexAdmin'])->name('admin.orders.index');
+    Route::patch('admin/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
 
 });
 
@@ -140,4 +171,4 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
    Password: password
 
    Setelah login, akses: http://localhost/admin/categories atau /admin/services
-*/ 
+*/

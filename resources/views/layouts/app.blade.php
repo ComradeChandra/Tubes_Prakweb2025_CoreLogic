@@ -33,7 +33,10 @@
                     @if(Auth::user()->role !== 'admin')
                         <a href="{{ route('orders.history') }}" class="text-gray-300 hover:text-white border border-gray-600 hover:bg-gray-700 font-medium rounded text-xs px-3 py-2 uppercase">MY ORDERS</a>
                     @endif
-                    <a href="{{ route('logout') }}" class="text-white bg-red-900 border border-red-700 hover:bg-red-800 font-medium rounded text-xs px-3 py-2 uppercase">LOGOUT</a>
+                    <form action="{{ route('logout') }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" class="text-white bg-red-900 border border-red-700 hover:bg-red-800 font-medium rounded text-xs px-3 py-2 uppercase">LOGOUT</button>
+                    </form>
                 </div>
             @else
                 <a href="{{ route('login') }}" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-900 font-medium rounded-lg text-sm px-4 py-2">CLIENT LOGIN</a>
