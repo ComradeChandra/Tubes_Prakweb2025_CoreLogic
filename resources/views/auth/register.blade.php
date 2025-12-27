@@ -28,7 +28,7 @@
         </div>
 
         {{-- Form Register --}}
-        <form action="{{ route('register.post') }}" method="POST" class="space-y-5">
+        <form action="{{ route('register.post') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
             
             {{-- Name Input --}}
@@ -47,6 +47,24 @@
                     class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded focus:ring-red-500 focus:border-red-500 block p-2.5 placeholder-gray-600" 
                     placeholder="name@company.com">
                 @error('email') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
+
+            {{-- NIK Input --}}
+            <div>
+                <label for="nik" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">NIK (National ID)</label>
+                <input type="text" name="nik" id="nik" required 
+                    class="w-full bg-gray-900/50 border border-gray-600 text-white text-sm rounded focus:ring-red-500 focus:border-red-500 block p-2.5 placeholder-gray-600" 
+                    placeholder="16 Digit NIK">
+                @error('nik') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+            </div>
+
+            {{-- ID Card Upload (KTP) --}}
+            <div>
+                <label for="id_card" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Upload ID Card (KTP)</label>
+                <input type="file" name="id_card" id="id_card" required accept="image/*"
+                    class="w-full text-sm text-gray-400 border border-gray-600 rounded cursor-pointer bg-gray-900/50 focus:outline-none">
+                <p class="mt-1 text-xs text-gray-500">JPG, PNG, or PDF (Max. 2MB). Required for verification.</p>
+                @error('id_card') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
             </div>
 
             {{-- Password Input --}}

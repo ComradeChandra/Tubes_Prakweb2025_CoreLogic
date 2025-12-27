@@ -33,7 +33,10 @@ class OrderController extends Controller
             'quantity'   => 'required|integer|min:1', 
             'start_date' => 'required|date|after_or_equal:today', // Gak boleh tanggal kemaren
             'end_date'   => 'required|date|after:start_date',     // Harus setelah start date
-            'notes'      => 'nullable|string|max:1000', 
+            'notes'      => 'nullable|string|max:1000',
+            'address'    => 'required|string|max:1000', // Alamat pengiriman wajib
+            'latitude'   => 'nullable|numeric',
+            'longitude'  => 'nullable|numeric',
         ]);
 
         // 2. AMBIL DATA SERVICE ASLI DARI DB
@@ -57,7 +60,20 @@ class OrderController extends Controller
         $weeks = ceil(max($days, 1) / 7); 
 
         // Rumus Final: Harga Unit (Per Minggu) * Jumlah Pesanan * Jumlah Minggu
-        $totalPrice = $service->price * $validated['quantity'] * $weeks;
+        $subtotal = $service->price * $validated['quantity'] * $weeks;
+
+        // [PRAK-20] MEMBERSHIP TIER LOGIC (GAMIFICATION)
+        // Cek Tier User buat kasih diskon
+        $user = Auth::user();
+        $discount = 0;
+
+        if ($user->tier === 'VIP') {
+            $discount = $subtotal * 0.10; // Diskon 10% buat VIP
+        } elseif ($user->tier === 'Elite') {
+            $discount = $subtotal * 0.20; // Diskon 20% buat Elite
+        }
+
+        $finalPrice = $subtotal - $discount;
 
         // 4. SIMPAN KE DATABASE
         // Masukin semua data ke tabel 'orders'
@@ -67,14 +83,23 @@ class OrderController extends Controller
             'quantity'    => $validated['quantity'],
             'start_date'  => $validated['start_date'],
             'end_date'    => $validated['end_date'],
-            'total_price' => $totalPrice, 
+            'total_price' => $finalPrice, // Harga setelah diskon
+            'discount'    => $discount,   // Catat diskonnya
             'status'      => 'PENDING', 
             'notes'       => $validated['notes'] ?? null,
+            'address'     => $validated['address'],
+            'latitude'    => $validated['latitude'] ?? null,
+            'longitude'   => $validated['longitude'] ?? null,
         ]);
+
+        // [AUTO-TIER UPDATE]
+        // Cek total belanja user setelah order ini (kalau nanti diapprove)
+        // Tapi logic update tier sebaiknya pas order di-APPROVE admin, bukan pas create.
+        // Jadi logic update tier kita taruh di method updateStatus aja.
 
         // 5. REDIRECT
         // Balikin ke katalog sambil bawa pesan sukses
-        return redirect('/catalog')->with('success', 'Order berhasil dibuat! Kontrak berlaku selama ' . $weeks . ' minggu.');
+        return redirect('/catalog')->with('success', 'Order berhasil dibuat! Kamu hemat $' . number_format($discount, 2));
     }
 
     /**
@@ -105,6 +130,22 @@ class OrderController extends Controller
         $order->update([
             'status' => $validated['status']
         ]);
+
+        // [PRAK-20] AUTO-TIER UPDATE LOGIC
+        // Kalau order di-APPROVE, kita cek total belanja user buat naik level.
+        if ($validated['status'] === 'APPROVED') {
+            $user = $order->user;
+            
+            // Hitung total belanja user yang statusnya APPROVED
+            $totalSpent = $user->orders()->where('status', 'APPROVED')->sum('total_price');
+
+            // Cek Threshold Tier
+            if ($totalSpent >= 50000) {
+                $user->update(['tier' => 'Elite']);
+            } elseif ($totalSpent >= 10000) {
+                $user->update(['tier' => 'VIP']);
+            }
+        }
 
         // Balik lagi ke halaman list dengan pesan sukses
         return redirect()->route('admin.orders.index')

@@ -10,6 +10,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\OrderController; // Controller baru buat handle order
 use App\Http\Controllers\DashboardController; // Controller khusus Dashboard Admin
+use App\Http\Controllers\ProfileController; // Controller Profile User
+use App\Http\Controllers\UserController; // Controller Admin Manage User
 
 /*
 |--------------------------------------------------------------------------
@@ -84,6 +86,10 @@ Route::middleware(['auth'])->group(function () {
     // Halaman History Order User
     Route::get('/my-orders', [OrderController::class, 'history'])->name('orders.history');
 
+    // --- USER PROFILE (NEW SPRINT 3) ---
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
 });
 
 /*
@@ -140,7 +146,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Admin bisa liat list order & update status (Approve/Reject)
     Route::get('admin/orders', [OrderController::class, 'indexAdmin'])->name('admin.orders.index');
     Route::patch('admin/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
-
+    // --- MANAGE USERS (NEW) ---
+    // Admin bisa liat list user, detail, dan hapus user
+    Route::resource('admin/users', UserController::class)
+         ->names('admin.users')
+         ->only(['index', 'show', 'destroy']);
 });
 
 /*

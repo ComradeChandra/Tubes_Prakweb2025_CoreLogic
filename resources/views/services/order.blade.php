@@ -64,11 +64,29 @@
                 </div>
             </div>
 
+            <!-- Input Address & Map -->
+            <div class="mb-4 text-left">
+                <label class="block text-sm font-bold mb-2">Deployment Address</label>
+                <textarea name="address" id="address" rows="2" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:border-red-500 focus:outline-none mb-2" placeholder="Full address for unit deployment..."></textarea>
+                
+                <!-- Leaflet Map Container -->
+                <div id="map" class="w-full h-64 rounded border border-gray-600 z-0"></div>
+                <p class="text-xs text-gray-400 mt-1">*Click on the map to pinpoint location.</p>
+                
+                <!-- Hidden Inputs for Coordinates -->
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+            </div>
+
             <!-- Input Notes -->
             <div class="mb-6 text-left">
                 <label class="block text-sm font-bold mb-2">Mission Notes (Optional)</label>
                 <textarea name="notes" rows="3" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:border-red-500 focus:outline-none" placeholder="Specific requirements..."></textarea>
             </div>
+
+            <!-- Leaflet CSS & JS -->
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
             <!-- SCRIPT VALIDASI & KALKULATOR HARGA -->
             <!-- 
@@ -76,8 +94,57 @@
                 Script ini tugasnya ada 2:
                 1. UX Protection: Mencegah user milih tanggal yang gak masuk akal (Masa lalu / End date sebelum Start date).
                 2. Live Calculator: Biar user tau estimasi harga sebelum kaget pas checkout.
+                3. Map Logic: Nampilin peta dan ambil koordinat.
             -->
             <script>
+                // --- MAP LOGIC ---
+                // Default view: Jakarta (Monas)
+                var map = L.map('map').setView([-6.175392, 106.827153], 13);
+
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map);
+
+                var marker;
+
+                function onMapClick(e) {
+                    // Hapus marker lama kalo ada
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    
+                    // Tambah marker baru
+                    marker = L.marker(e.latlng).addTo(map);
+                    
+                    // Simpan koordinat ke hidden input
+                    document.getElementById('latitude').value = e.latlng.lat;
+                    document.getElementById('longitude').value = e.latlng.lng;
+
+                    // [AUTO-ADDRESS] Reverse Geocoding (Nominatim API)
+                    // Kasih loading text dulu biar user tau lagi mikir
+                    const addressInput = document.getElementById('address');
+                    addressInput.value = "Locating address...";
+                    addressInput.classList.add('animate-pulse');
+
+                    // Fetch ke OpenStreetMap Nominatim
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // Masukin alamat hasil temuan ke textarea
+                            addressInput.value = data.display_name;
+                            addressInput.classList.remove('animate-pulse');
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            addressInput.value = "Address not found. Please type manually.";
+                            addressInput.classList.remove('animate-pulse');
+                        });
+                }
+
+                map.on('click', onMapClick);
+
+                // --- CALCULATOR LOGIC ---
                 const startInput = document.getElementById('start_date');
                 const endInput = document.getElementById('end_date');
                 const qtyInput = document.querySelector('input[name="quantity"]');

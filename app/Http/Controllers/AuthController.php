@@ -82,8 +82,17 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:8|confirmed' // confirmed biar ngecek password sama confirm_password sama
+            'password' => 'required|min:8|confirmed', // confirmed biar ngecek password sama confirm_password sama
+            'nik' => 'required|numeric|digits:16', // NIK wajib 16 digit
+            'id_card' => 'required|image|max:2048', // Wajib upload KTP, max 2MB
         ]);
+
+        // Handle File Upload
+        $idCardPath = null;
+        if ($request->hasFile('id_card')) {
+            // Simpan di folder 'storage/app/public/id_cards'
+            $idCardPath = $request->file('id_card')->store('id_cards', 'public');
+        }
 
         // Bikin username otomatis (Soalnya di database wajib ada kolom username)
         // Kita ambil dari nama depan email terus tambahin angka random.
@@ -102,6 +111,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'username' => $usernameJadi,
             'password' => Hash::make($request->password), // Jangan lupa di-hash!
+            'nik' => $request->nik,
+            'id_card_path' => $idCardPath, // Simpan path KTP
             'role' => 'customer' // Default user biasa
         ]);
 
