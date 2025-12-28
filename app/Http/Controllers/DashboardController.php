@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -58,5 +59,35 @@ class DashboardController extends Controller
             'totalRevenue',
             'recentOrders'
         ));
+    }
+
+    /**
+     * Method untuk ambil data laporan penjualan bulanan
+     * Nanti dipake buat generate PDF
+     */
+    public function getMonthlySalesData(Request $request)
+    {
+        // Ambil parameter bulan dan tahun dari request
+        // Kalau gak ada, pake bulan sekarang
+        $month = $request->get('month', Carbon::now()->month);
+        $year = $request->get('year', Carbon::now()->year);
+
+        // Query orders berdasarkan bulan dan tahun
+        $orders = Order::with(['user', 'service'])
+                    ->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month)
+                    ->where('status', 'APPROVED') // Cuma yang approved
+                    ->get();
+
+        // Hitung total revenue bulan ini
+        $monthlyRevenue = $orders->sum('total_price');
+
+        return [
+            'orders' => $orders,
+            'monthlyRevenue' => $monthlyRevenue,
+            'month' => $month,
+            'year' => $year,
+            'totalOrders' => $orders->count()
+        ];
     }
 }
