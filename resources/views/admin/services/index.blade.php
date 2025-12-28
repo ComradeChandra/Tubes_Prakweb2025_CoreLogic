@@ -81,7 +81,7 @@ DESIGN SYSTEM:
 
     {{-- FORM SEARCH & FILTER --}}
     <div class="bg-gray-800 border border-gray-700 rounded-lg p-4">
-        <form action="{{ route('admin.services.index') }}" method="GET" class="flex flex-col md:flex-row gap-3">
+        <form id="filterForm" action="{{ route('admin.services.index') }}" method="GET" class="flex flex-col md:flex-row gap-3">
             {{-- Search Input --}}
             <div class="flex-1">
                 <input type="text"
@@ -94,6 +94,8 @@ DESIGN SYSTEM:
             {{-- Category Filter Dropdown --}}
             <div class="md:w-64">
                 <select name="category"
+                        id="categoryFilter"
+                        onchange="document.getElementById('filterForm').submit()"
                         class="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-red-500">
                     <option value="">Semua Kategori</option>
                     @foreach($categories as $category)
@@ -105,7 +107,7 @@ DESIGN SYSTEM:
             </div>
 
             <button type="submit" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition">
-                Filter
+                Search
             </button>
             @if(request('search') || request('category'))
                 <a href="{{ route('admin.services.index') }}" class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition">
