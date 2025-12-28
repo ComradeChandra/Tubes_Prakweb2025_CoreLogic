@@ -79,9 +79,10 @@ DESIGN SYSTEM:
         </div>
     </div>
 
-    {{-- FORM SEARCH --}}
+    {{-- FORM SEARCH & FILTER --}}
     <div class="bg-gray-800 border border-gray-700 rounded-lg p-4">
-        <form action="{{ route('admin.services.index') }}" method="GET" class="flex gap-3">
+        <form action="{{ route('admin.services.index') }}" method="GET" class="flex flex-col md:flex-row gap-3">
+            {{-- Search Input --}}
             <div class="flex-1">
                 <input type="text"
                        name="search"
@@ -89,8 +90,22 @@ DESIGN SYSTEM:
                        placeholder="Cari nama atau deskripsi unit..."
                        class="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-red-500 focus:border-red-500">
             </div>
+
+            {{-- Category Filter Dropdown --}}
+            <div class="md:w-64">
+                <select name="category"
+                        class="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    <option value="">Semua Kategori</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
             <button type="submit" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition">
-                Search
+                Filter
             </button>
             @if(request('search') || request('category'))
                 <a href="{{ route('admin.services.index') }}" class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition">
