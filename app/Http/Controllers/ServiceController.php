@@ -11,13 +11,32 @@ use Illuminate\Support\Facades\Storage;
 
 class ServiceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $services = Service::with('category')
-                          ->latest()
-                          ->get();
+        // Query builder buat services
+        $query = Service::with('category');
 
-        return view('admin.services.index', compact('services'));
+        // Filter berdasarkan search keyword (nama atau deskripsi)
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Filter berdasarkan kategori
+        if ($request->has('category') && $request->category != '') {
+            $query->where('category_id', $request->category);
+        }
+
+        // Ambil hasil query
+        $services = $query->latest()->get();
+
+        // Ambil semua kategori buat dropdown filter
+        $categories = Category::orderBy('name')->get();
+
+        return view('admin.services.index', compact('services', 'categories'));
     }
 
     // Menampilkan form tambah unit baru
