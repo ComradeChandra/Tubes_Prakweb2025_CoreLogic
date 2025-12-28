@@ -8,6 +8,7 @@ use App\Models\Service;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DashboardController extends Controller
 {
@@ -89,5 +90,22 @@ class DashboardController extends Controller
             'year' => $year,
             'totalOrders' => $orders->count()
         ];
+    }
+
+    /**
+     * Generate dan download PDF laporan penjualan bulanan
+     */
+    public function downloadMonthlySalesReport(Request $request)
+    {
+        // Ambil data pake method yang udah dibuat
+        $data = $this->getMonthlySalesData($request);
+
+        // Generate PDF dari view template
+        $pdf = Pdf::loadView('pdf.monthly_sales', $data);
+
+        // Download PDF dengan nama file yang jelas
+        $filename = 'Laporan_Penjualan_' . $data['month'] . '_' . $data['year'] . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

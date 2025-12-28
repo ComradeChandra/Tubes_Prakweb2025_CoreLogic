@@ -141,6 +141,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('admin/orders', [OrderController::class, 'indexAdmin'])->name('admin.orders.index');
     Route::patch('admin/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
 
+    // ===== EXPORT LAPORAN PDF =====
+    // Download laporan penjualan bulanan dalam format PDF
+    Route::get('admin/reports/monthly-sales', [DashboardController::class, 'downloadMonthlySalesReport'])->name('admin.reports.monthly');
+
 });
 
 /*
