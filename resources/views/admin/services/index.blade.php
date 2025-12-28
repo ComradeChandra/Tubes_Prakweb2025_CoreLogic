@@ -79,7 +79,65 @@ DESIGN SYSTEM:
         </div>
     </div>
 
-    {{-- 
+    {{-- FORM SEARCH & FILTER --}}
+    <div class="bg-gray-800 border border-gray-700 rounded-lg p-4">
+        <form id="filterForm" action="{{ route('admin.services.index') }}" method="GET" class="flex flex-col md:flex-row gap-3">
+            {{-- Search Input --}}
+            <div class="flex-1">
+                <input type="text"
+                       name="search"
+                       value="{{ request('search') }}"
+                       placeholder="Cari nama atau deskripsi unit..."
+                       class="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-red-500 focus:border-red-500">
+            </div>
+
+            {{-- Category Filter Dropdown --}}
+            <div class="md:w-64">
+                <select name="category"
+                        id="categoryFilter"
+                        onchange="document.getElementById('filterForm').submit()"
+                        class="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    <option value="">Semua Kategori</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                            {{ $category->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <button type="submit" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition">
+                Search
+            </button>
+            @if(request('search') || request('category'))
+                <a href="{{ route('admin.services.index') }}" class="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition">
+                    Reset
+                </a>
+            @endif
+        </form>
+    </div>
+
+    {{-- INFO HASIL PENCARIAN --}}
+    @if(request('search') || request('category'))
+        <div class="bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm">
+            <span class="text-gray-300">
+                Menampilkan <span class="font-bold text-white">{{ $services->count() }}</span> hasil
+                @if(request('search'))
+                    untuk pencarian "<span class="font-bold text-red-400">{{ request('search') }}</span>"
+                @endif
+                @if(request('category'))
+                    @php
+                        $selectedCategory = $categories->firstWhere('id', request('category'));
+                    @endphp
+                    @if($selectedCategory)
+                        di kategori "<span class="font-bold text-red-400">{{ $selectedCategory->name }}</span>"
+                    @endif
+                @endif
+            </span>
+        </div>
+    @endif
+
+    {{--
         [TABLE SECTION]
         Tabel utama yang menampilkan data services.
         Menggunakan 'overflow-x-auto' agar responsif di mobile.
@@ -215,10 +273,15 @@ DESIGN SYSTEM:
                             <td colspan="8" class="px-6 py-16 text-center text-gray-500">
                                 <div class="flex flex-col items-center">
                                     <svg class="w-12 h-12 mb-3 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                     </svg>
-                                    <p class="text-lg font-medium">No tactical units available.</p>
-                                    <p class="text-sm mt-1">Sistem belum memiliki data unit. Silakan tambah unit baru.</p>
+                                    @if(request('search') || request('category'))
+                                        <p class="text-lg font-medium">Tidak ada hasil yang ditemukan</p>
+                                        <p class="text-sm mt-1">Coba ubah kata kunci pencarian atau filter kategori</p>
+                                    @else
+                                        <p class="text-lg font-medium">No tactical units available.</p>
+                                        <p class="text-sm mt-1">Sistem belum memiliki data unit. Silakan tambah unit baru.</p>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
