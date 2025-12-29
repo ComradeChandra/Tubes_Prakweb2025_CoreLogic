@@ -151,6 +151,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('admin/users', UserController::class)
          ->names('admin.users')
          ->only(['index', 'show', 'destroy']);
+
+    // ===== EXPORT LAPORAN PDF =====
+    // Download laporan penjualan bulanan dalam format PDF
+    Route::get('admin/reports/monthly-sales', [DashboardController::class, 'downloadMonthlySalesReport'])->name('admin.reports.monthly');
 });
 
 /*
