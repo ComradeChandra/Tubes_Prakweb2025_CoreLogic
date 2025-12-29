@@ -42,12 +42,15 @@
 
                 <div class="w-full md:w-auto flex items-center gap-2">
                     <label for="category" class="sr-only">Filter Category</label>
-                    <select id="category" name="category" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-3.5">
+                    {{-- Tambahin onchange biar pas pilih langsung reload filter, gak perlu klik search lagi --}}
+                    <select id="category" name="category" onchange="this.form.submit()" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-3.5">
                         <option selected value="">All Categories</option>
-                        <option value="combat" {{ request('category') == 'combat' ? 'selected' : '' }}>Combat Units</option>
-                        <option value="vip" {{ request('category') == 'vip' ? 'selected' : '' }}>VIP Escort</option>
-                        <option value="k9" {{ request('category') == 'k9' ? 'selected' : '' }}>K9 Units</option>
-                        <option value="security" {{ request('category') == 'security' ? 'selected' : '' }}>Base Security</option>
+                        {{-- Loop kategori dari database biar dinamis, gak manual lagi --}}
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
+                                {{ $cat->name }}
+                            </option>
+                        @endforeach
                     </select>
                     
                     <a href="{{ url('/catalog') }}" class="p-3.5 text-sm font-medium text-white bg-gray-700 rounded-lg border border-gray-600 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-700">

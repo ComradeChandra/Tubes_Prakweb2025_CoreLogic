@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 // UPDATE: Panggil Model Service biar bisa ambil data Unit buat Katalog
 use App\Models\Service;
+use App\Models\Category; // Tambahin ini biar filter kategori di katalog jalan dinamis
 // CRUD Admin Controllers
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ServiceController;
@@ -32,13 +33,8 @@ Route::get('/', function () {
 
 // 2. HALAMAN KATALOG (DAFTAR UNIT)
 // UPDATE: Ini rute baru buat nampilin halaman Katalog buatan Nauval.
-Route::get('/catalog', function () {
-    // Logika: Ambil semua data dari tabel 'services' di database
-    $services = Service::all();
-    
-    // Kirim datanya ke view 'catalog.blade.php' biar bisa di-looping di sana
-    return view('catalog', compact('services'));
-});
+// Urg arahin ke Controller biar logic search & filternya jalan (jangan pake closure function lagi).
+Route::get('/catalog', [ServiceController::class, 'publicCatalog']);
 
 // 3. SISTEM AUTHENTICATION (LOGIN & REGISTER)
 // Urg kelompokkin pake 'controller' biar rapi, gak perlu ngetik [AuthController::class] berkali-kali.

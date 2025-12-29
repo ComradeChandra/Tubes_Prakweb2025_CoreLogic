@@ -77,14 +77,14 @@
                         placeholder="••••••••">
                 </div>
 
-                <!-- REMEMBER ME & FORGOT PASSWORD -->
+                <!-- REMEMBER ME -->
                 <div class="flex items-center justify-between mb-6">
                     <label class="flex items-center text-sm text-gray-400 hover:text-gray-300 cursor-pointer">
                         <input type="checkbox" name="remember" class="w-4 h-4 text-red-600 bg-gray-900 border-gray-600 rounded focus:ring-red-600 focus:ring-offset-gray-800">
                         <span class="ml-2">Keep me logged in</span>
                     </label>
                     
-                    <a href="#" class="text-sm text-red-500 hover:text-red-400 transition-colors">Forgot password?</a>
+                    {{-- Forgot password dihapus dulu karena butuh SMTP Server --}}
                 </div>
 
                 <!-- TOMBOL LOGIN -->
