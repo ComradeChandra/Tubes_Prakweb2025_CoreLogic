@@ -51,7 +51,10 @@
           <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-700 rounded-lg bg-gray-800 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-gray-900 items-center">
             <li><a href="/" class="block py-2 px-3 text-white bg-red-700 md:bg-transparent md:text-red-500 md:p-0">HOME</a></li>
             <li><a href="/catalog" class="block py-2 px-3 text-gray-300 hover:bg-gray-700 md:hover:bg-transparent md:hover:text-red-500 md:p-0">CATALOG</a></li>
-            <li><a href="#" class="block py-2 px-3 text-gray-300 hover:bg-gray-700 md:hover:bg-transparent md:hover:text-red-500 md:p-0">CONTACT</a></li>
+<li><a href="https://wa.me/628123456789"
+     target="_blank"
+     class="block py-2 px-3 text-gray-300 hover:bg-gray-700 md:hover:bg-transparent md:hover:text-red-500 md:p-0">
+     CONTACT</a></li>
             @auth
                 @if(Auth::user()->role === 'admin')
                     <li><a href="{{ route('admin.dashboard') }}" class="block py-2 px-3 text-red-500 font-bold border border-red-500 rounded hover:bg-red-900/20 md:border-0 md:hover:text-red-400 md:p-0 uppercase tracking-wider">⚠ ADMIN PANEL</a></li>
