@@ -64,8 +64,7 @@
         <div class="grid gap-8 mb-6 lg:mb-16 md:grid-cols-2 lg:grid-cols-4">
 
             @foreach($services as $service)
-            <div class="bg-gray-800 rounded-lg shadow border border-gray-700 hover:border-red-600 transition duration-300 flex flex-col h-full">
-
+                <div class="bg-gray-800 rounded-lg shadow-md border border-gray-700 hover:border-red-500 transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl hover:shadow-red-900/40 flex flex-col h-full">
                 @php
                     $imgUrl = $service->image 
                         ? asset('storage/' . $service->image) 
