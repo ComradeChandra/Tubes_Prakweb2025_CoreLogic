@@ -4,12 +4,27 @@
 <section class="bg-gray-900 py-12">
     <div class="px-4 mx-auto max-w-7xl">
 
-        @if(session('success'))
-            <div class="p-4 mb-6 text-sm text-green-100 rounded-lg bg-green-800 border border-green-600" role="alert">
-                <span class="font-bold">MISSION CONFIRMED!</span> 
-                {{ session('success') }}
-            </div>
-        @endif
+       @if(session('success'))
+    <div class="flex items-center gap-3 p-4 mb-6 text-sm text-green-100 
+                rounded-lg bg-green-800 
+                border-2 border-green-600 
+                shadow-lg"
+         role="alert">
+
+        <!-- Check Icon -->
+        <svg class="w-5 h-5 text-green-300 flex-shrink-0"
+             fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M5 13l4 4L19 7" />
+        </svg>
+
+        <span>
+            <span class="font-bold">MISSION CONFIRMED!</span>
+            {{ session('success') }}
+        </span>
+    </div>
+@endif
 
         <div class="mx-auto max-w-screen-sm text-center mb-8 lg:mb-12">
             <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-white">
