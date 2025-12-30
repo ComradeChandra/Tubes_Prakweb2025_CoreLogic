@@ -77,17 +77,29 @@
         
         /* SUMMARY BOX (Kanan Bawah) */
         .summary-container {
-            width: 45%;
-            float: right;
+            width: 100%;
             margin-top: 25px;
             border: 2px solid #333;
             padding: 15px;
             background-color: #fff;
         }
         .summary-row {
+            display: table;
+            width: 100%;
             border-bottom: 1px dashed #ccc;
-            padding-bottom: 5px;
-            margin-bottom: 5px;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+        .summary-row span {
+            display: table-cell;
+        }
+        .summary-row .label {
+            text-align: left;
+            width: 60%;
+        }
+        .summary-row .value {
+            text-align: right;
+            width: 40%;
         }
         .grand-total {
             font-size: 16px;
@@ -96,6 +108,19 @@
             border-top: 2px solid #333;
             padding-top: 10px;
             margin-top: 5px;
+            display: table;
+            width: 100%;
+        }
+        .grand-total span {
+            display: table-cell;
+        }
+        .grand-total .label {
+            text-align: left;
+            width: 60%;
+        }
+        .grand-total .value {
+            text-align: right;
+            width: 40%;
         }
 
         /* FOOTER HALAMAN */
@@ -164,21 +189,18 @@
 
     <div class="summary-container">
         <div class="summary-row">
-            <span style="float:left;">Total Transactions:</span>
-            <span style="float:right;">{{ $orders->count() }} Orders</span>
-            <div style="clear:both;"></div>
+            <span class="label">Total Transactions:</span>
+            <span class="value">{{ $orders->count() }} Orders</span>
         </div>
-        
+
         <div class="summary-row">
-            <span style="float:left;">Report Status:</span>
-            <span style="float:right; color: green; font-weight: bold;">VERIFIED</span>
-            <div style="clear:both;"></div>
+            <span class="label">Report Status:</span>
+            <span class="value" style="color: green; font-weight: bold;">VERIFIED</span>
         </div>
 
         <div class="grand-total">
-            <span style="float:left;">TOTAL REVENUE:</span>
-            <span style="float:right;">${{ number_format($monthlyRevenue, 2) }}</span>
-            <div style="clear:both;"></div>
+            <span class="label">TOTAL REVENUE:</span>
+            <span class="value">${{ number_format($monthlyRevenue, 2) }}</span>
         </div>
     </div>
 
