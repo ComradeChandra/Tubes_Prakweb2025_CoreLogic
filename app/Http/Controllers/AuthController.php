@@ -85,7 +85,9 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:8|confirmed' // confirmed biar ngecek password sama confirm_password sama
+            'password' => 'required|min:8|confirmed', // confirmed biar ngecek password sama confirm_password sama
+            'nik' => 'required|numeric|digits:16', // NIK wajib 16 digit
+            'id_card' => 'required|image|max:2048', // Wajib upload KTP, max 2MB
         ], [
             'name.required' => 'Please enter your full name.',
             'name.max' => 'Name must not exceed 255 characters.',
@@ -94,8 +96,20 @@ class AuthController extends Controller
             'email.unique' => 'This email address is already registered.',
             'password.required' => 'Password is required.',
             'password.min' => 'Password requires at least 8 characters.',
-            'password.confirmed' => 'Password confirmation does not match.'
+            'password.confirmed' => 'Password confirmation does not match.',
+            'nik.required' => 'National ID (NIK) is required.',
+            'nik.digits' => 'NIK must be exactly 16 digits.',
+            'id_card.required' => 'ID Card photo is required.',
+            'id_card.image' => 'File must be an image.',
+            'id_card.max' => 'Image size must not exceed 2MB.'
         ]);
+
+        // Handle File Upload
+        $idCardPath = null;
+        if ($request->hasFile('id_card')) {
+            // Simpan di folder 'storage/app/public/id_cards'
+            $idCardPath = $request->file('id_card')->store('id_cards', 'public');
+        }
 
         // Bikin username otomatis (Soalnya di database wajib ada kolom username)
         // Kita ambil dari nama depan email terus tambahin angka random.
@@ -114,6 +128,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'username' => $usernameJadi,
             'password' => Hash::make($request->password), // Jangan lupa di-hash!
+            'nik' => $request->nik,
+            'id_card_path' => $idCardPath, // Simpan path KTP
             'role' => 'customer' // Default user biasa
         ]);
 

@@ -39,6 +39,40 @@ class ServiceController extends Controller
         return view('admin.services.index', compact('services', 'categories'));
     }
 
+    /**
+     * Method khusus buat Halaman Katalog (Frontend Public).
+     * Logic-nya mirip index admin, tapi view-nya beda.
+     * Urg pisahin biar gak pusing ngurusin permission admin vs user biasa.
+     */
+    public function publicCatalog(Request $request)
+    {
+        // 1. Mulai Query Service (Eager load category biar enteng)
+        $query = Service::with('category');
+
+        // 2. Cek ada request pencarian gak? (Search Bar)
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
+
+        // 3. Cek ada filter kategori gak? (Dropdown)
+        if ($request->has('category') && $request->category != '') {
+            $query->where('category_id', $request->category);
+        }
+
+        // 4. Eksekusi Query (Tampilin yang statusnya available aja kali ya? Tapi semua dulu deh)
+        $services = $query->latest()->get();
+
+        // 5. Ambil data kategori buat isi dropdown filter
+        $categories = Category::orderBy('name')->get();
+
+        // 6. Lempar ke view catalog punya Nauval
+        return view('catalog', compact('services', 'categories'));
+    }
+
     // Menampilkan form tambah unit baru
     public function create()
     {

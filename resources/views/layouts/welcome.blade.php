@@ -24,7 +24,8 @@
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
                 </svg>
             </a>
-            <a href="#" class="inline-flex justify-center items-center py-3 px-5 sm:ms-4 text-base font-medium text-center text-white rounded-lg border border-gray-500 hover:bg-gray-800 focus:ring-4 focus:ring-gray-700 transition">
+            {{-- Link Konsultasi arahin ke WA biar keliatan real --}}
+            <a href="https://wa.me/628123456789" target="_blank" class="inline-flex justify-center items-center py-3 px-5 sm:ms-4 text-base font-medium text-center text-white rounded-lg border border-gray-500 hover:bg-gray-800 focus:ring-4 focus:ring-gray-700 transition">
                 KONSULTASI
             </a>
         </div>

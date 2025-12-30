@@ -5,11 +5,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 // UPDATE: Panggil Model Service biar bisa ambil data Unit buat Katalog
 use App\Models\Service;
+use App\Models\Category; // Tambahin ini biar filter kategori di katalog jalan dinamis
 // CRUD Admin Controllers
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\OrderController; // Controller baru buat handle order
 use App\Http\Controllers\DashboardController; // Controller khusus Dashboard Admin
+use App\Http\Controllers\ProfileController; // Controller Profile User
+use App\Http\Controllers\UserController; // Controller Admin Manage User
 
 /*
 |--------------------------------------------------------------------------
@@ -30,13 +33,8 @@ Route::get('/', function () {
 
 // 2. HALAMAN KATALOG (DAFTAR UNIT)
 // UPDATE: Ini rute baru buat nampilin halaman Katalog buatan Nauval.
-Route::get('/catalog', function () {
-    // Logika: Ambil semua data dari tabel 'services' di database
-    $services = Service::all();
-    
-    // Kirim datanya ke view 'catalog.blade.php' biar bisa di-looping di sana
-    return view('catalog', compact('services'));
-});
+// Urg arahin ke Controller biar logic search & filternya jalan (jangan pake closure function lagi).
+Route::get('/catalog', [ServiceController::class, 'publicCatalog']);
 
 // 3. SISTEM AUTHENTICATION (LOGIN & REGISTER)
 // Urg kelompokkin pake 'controller' biar rapi, gak perlu ngetik [AuthController::class] berkali-kali.
@@ -83,6 +81,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Halaman History Order User
     Route::get('/my-orders', [OrderController::class, 'history'])->name('orders.history');
+
+    // --- USER PROFILE (NEW SPRINT 3) ---
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
 });
 
@@ -140,11 +142,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Admin bisa liat list order & update status (Approve/Reject)
     Route::get('admin/orders', [OrderController::class, 'indexAdmin'])->name('admin.orders.index');
     Route::patch('admin/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
+    // --- MANAGE USERS (NEW) ---
+    // Admin bisa liat list user, detail, dan hapus user
+    Route::resource('admin/users', UserController::class)
+         ->names('admin.users')
+         ->only(['index', 'show', 'destroy']);
 
     // ===== EXPORT LAPORAN PDF =====
     // Download laporan penjualan bulanan dalam format PDF
     Route::get('admin/reports/monthly-sales', [DashboardController::class, 'downloadMonthlySalesReport'])->name('admin.reports.monthly');
-
 });
 
 /*

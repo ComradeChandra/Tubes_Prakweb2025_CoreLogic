@@ -58,7 +58,8 @@
                                         </td>
                                         <td class="px-6 py-4">
                                             @if($order->status == 'APPROVED')
-                                                <a href="#" class="font-medium text-blue-500 hover:underline">📄 Invoice</a>
+                                                {{-- Invoice PDF belum ada, jadi disable dulu --}}
+                                                <span class="text-gray-500 text-xs italic">Invoice sent to email</span>
                                             @else
                                                 <span class="text-gray-600">-</span>
                                             @endif
