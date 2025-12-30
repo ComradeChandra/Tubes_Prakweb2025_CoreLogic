@@ -171,6 +171,44 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('admin/reports/monthly-sales', [DashboardController::class, 'downloadMonthlySalesReport'])->name('admin.reports.monthly');
 });
 
+// DEV-SAFE: Smoke test route to create a test order and set KTP verified (only local environment)
+if (app()->environment('local')) {
+    Route::get('/dev/smoke-order', function() {
+        $user = \App\Models\User::where('email', 'customer@test.com')->first();
+        if (!$user) return response('Test user not found', 404);
+
+        $user->update(['id_card_path' => 'id_cards/sample.jpg', 'ktp_verified' => true]);
+
+        $service = \App\Models\Service::first();
+        if (!$service) return response('No service found', 404);
+
+        $start = now()->addDay()->toDateString();
+        $end = now()->addDays(3)->toDateString();
+        $quantity = 2;
+
+        $startDT = \Carbon\Carbon::parse($start);
+        $endDT = \Carbon\Carbon::parse($end);
+        $days = $startDT->diffInDays($endDT);
+        $weeks = ceil(max($days, 1) / 7);
+
+        $subtotal = $service->price * $quantity * $weeks;
+
+        $order = \App\Models\Order::create([
+            'user_id' => $user->id,
+            'service_id' => $service->id,
+            'quantity' => $quantity,
+            'start_date' => $start,
+            'end_date' => $end,
+            'total_price' => $subtotal,
+            'discount' => 0,
+            'status' => 'PENDING',
+            'address' => 'Smoke Test Address',
+        ]);
+
+        return response()->json(['order_id' => $order->id, 'total_price' => $order->total_price]);
+    });
+}
+
 /*
 ========== CATATAN LOGIKA INTEGRASI (URG) ==========
 
