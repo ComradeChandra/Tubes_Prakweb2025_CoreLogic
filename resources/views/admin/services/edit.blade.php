@@ -149,13 +149,27 @@
                         placeholder="Jelaskan deskripsi lengkap unit keamanan ini (fitur, kemampuan, teknologi, dll)"
                         class="w-full px-4 py-2.5 text-sm text-gray-100 bg-gray-900 border @error('description') border-red-500 @else border-gray-600 @enderror rounded-lg focus:ring-red-500 focus:border-red-500 transition resize-none"
                         required
-                    >{{ old('description', $service->description) }}</textarea>
+> {{ old('description', $service->description) }}</textarea>
 
                     @error('description')
                         <p class="mt-2 text-sm text-red-400">
                             <span class="font-medium">Error:</span> {{ $message }}
                         </p>
                     @enderror
+
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label for="unit_size" class="block mb-2 text-sm font-medium text-gray-300">Unit Size (person per unit)</label>
+                        <input type="number" id="unit_size" name="unit_size" min="1" value="{{ old('unit_size', $service->unit_size ?? 1) }}" class="w-full px-4 py-2.5 text-sm text-gray-100 bg-gray-900 border border-gray-600 rounded-lg focus:ring-red-500 focus:border-red-500">
+                        <p class="text-xs text-gray-400 mt-1">Contoh: 1 (satu personel per unit) atau 3 (tiga personel per unit).</p>
+                    </div>
+
+                    <div>
+                        <label for="unit_description" class="block mb-2 text-sm font-medium text-gray-300">Unit Keterangan Singkat</label>
+                        <input type="text" id="unit_description" name="unit_description" value="{{ old('unit_description', $service->unit_description) }}" placeholder="Mis: 1 unit = 1 personel" class="w-full px-4 py-2.5 text-sm text-gray-100 bg-gray-900 border border-gray-600 rounded-lg focus:ring-red-500 focus:border-red-500">
+                        <p class="text-xs text-gray-400 mt-1">Teks singkat yang menjelaskan apa yang dimaksud satu unit.</p>
+                    </div>
+                </div>
                 </div>
 
                 {{-- ===== FIELD: STATUS ===== --}}
@@ -222,7 +236,7 @@
                         class="block w-full text-sm text-gray-300 border @error('image') border-red-500 @else border-gray-600 @enderror rounded-lg cursor-pointer bg-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 file:mr-4 file:py-2 file:px-4 file:rounded-l-lg file:border-0 file:text-sm file:font-medium file:bg-red-600 file:text-white hover:file:bg-red-700 transition"
                     >
 
-                    <p class="mt-1 text-xs text-gray-500">Format: JPG, PNG, WebP. Maksimal 2MB. Rasio 16:9 recommended.</p>
+                    <p class="mt-1 text-xs text-gray-500">Format: JPG, PNG, WebP. Maksimal 10MB. Rasio 16:9 recommended.</p>
 
                     @error('image')
                         <p class="mt-2 text-sm text-red-400">
@@ -294,7 +308,7 @@
                         onchange="previewCarouselImages(event)"
                         class="block w-full text-sm text-gray-300 border border-gray-600 rounded-lg cursor-pointer bg-gray-900 focus:outline-none focus:ring-red-500 focus:border-red-500 file:mr-4 file:py-2 file:px-4 file:rounded-l-lg file:border-0 file:text-sm file:font-medium file:bg-gray-700 file:text-white hover:file:bg-gray-600 transition"
                     >
-                    <p class="mt-1 text-xs text-gray-500">Bisa pilih banyak file sekaligus (Ctrl + Click). Max 2MB per file.</p>
+                    <p class="mt-1 text-xs text-gray-500">Bisa pilih banyak file sekaligus (Ctrl + Click). Max 10MB per file.</p>
 
                     {{-- PREVIEW CAROUSEL BARU --}}
                     <div id="carousel-preview-container" class="mt-4 hidden">

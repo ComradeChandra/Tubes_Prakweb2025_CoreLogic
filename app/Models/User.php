@@ -32,6 +32,7 @@ class User extends Authenticatable
         // Update: Data Lengkap User
         'nik',
         'id_card_path', // Path foto KTP
+        'ktp_verified', // boolean
         'phone',
         'address',
         'photo',
@@ -83,5 +84,25 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * RELASI: Simple in-app user notifications (user_notifications table)
+     *
+     * Catatan:
+     * - Gunakan relasi ini untuk mengambil notifikasi yang dibuat oleh sistem/admin.
+     * - Field `is_read` menandai apakah notifikasi sudah dilihat oleh user.
+     */
+    public function userNotifications()
+    {
+        return $this->hasMany(UserNotification::class);
+    }
+
+    /**
+     * Helper: Unread notification count
+     */
+    public function unreadNotificationsCount()
+    {
+        return $this->userNotifications()->where('is_read', false)->count();
     }
 }

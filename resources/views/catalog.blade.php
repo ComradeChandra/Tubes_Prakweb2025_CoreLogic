@@ -105,11 +105,14 @@
                         <span class="{{ $statusColor }} font-bold">{{ strtoupper($service->status) }}</span>
                     </p>
 
-                    <div class="mt-auto flex items-center justify-between">
-                        <span class="text-2xl font-bold text-red-500">$ {{ number_format($service->price, 0, ',', '.') }}</span>
-                        <a href="{{ url('/services/' . $service->id . '/order') }}" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-900 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                            HIRE NOW
-                        </a>
+                    <div class="mt-auto">
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold text-red-500">$ {{ number_format($service->price, 0, ',', '.') }}</span>
+                            <a href="{{ url('/services/' . $service->id . '/order') }}" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-900 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                HIRE NOW
+                            </a>
+                        </div>
+                        <div class="text-xs text-gray-400 mt-2">{{ $service->unit_description ?? ($service->unit_size . ' personel per unit') }}</div>
                     </div>
                 </div>
             </div>

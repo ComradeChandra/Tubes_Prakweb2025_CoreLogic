@@ -34,6 +34,39 @@
             </div>
         @endif
 
+        {{-- Notifikasi singkat: Tampilkan notifikasi KTP / lainnya --}}
+        @php
+            $unread = $user->userNotifications()->where('is_read', false)->count();
+            $latestNotifications = $user->userNotifications()->latest()->limit(5)->get();
+        @endphp
+
+        @if($unread > 0)
+            <div class="p-4 mb-6 text-sm text-yellow-300 rounded-lg bg-gray-800 border border-yellow-900" role="alert">
+                <span class="font-medium">NOTICE:</span> You have {{ $unread }} unread notification(s). <a href="#notifications" class="underline">View</a>
+            </div>
+        @endif
+
+        <div id="notifications" class="mb-6">
+            @if($latestNotifications->count())
+                <div class="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-semibold text-white">Recent Notifications</h3>
+                        <form action="{{ route('notifications.markRead') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-3 py-1 rounded">Mark all as read</button>
+                        </form>
+                    </div>
+                    <ul class="text-gray-300 text-sm list-disc pl-5">
+                        @foreach($latestNotifications as $note)
+                            <li class="mb-1">
+                                <strong class="text-white">{{ $note->title }}:</strong> {{ $note->message }} <span class="text-xs text-gray-400">&middot; {{ $note->created_at->diffForHumans() }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+        </div>
+
         <!-- MAIN FORM CONTAINER -->
         <div class="bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden">
             <div class="p-6 md:p-8">
@@ -193,6 +226,63 @@
                                 <label for="email" class="block mb-2 text-sm font-medium text-gray-300 uppercase tracking-wider">Email Address</label>
                                 <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" class="bg-gray-900 border border-gray-600 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" required>
                                 @error('email')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- NIK & Phone -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="nik" class="block mb-2 text-sm font-medium text-gray-300 uppercase tracking-wider">NIK</label>
+                                    <input type="text" id="nik" name="nik" value="{{ old('nik', $user->nik) }}" class="bg-gray-900 border border-gray-600 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">
+                                    @error('nik')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                                <div>
+                                    <label for="phone" class="block mb-2 text-sm font-medium text-gray-300 uppercase tracking-wider">Phone</label>
+                                    <input type="text" id="phone" name="phone" value="{{ old('phone', $user->phone) }}" class="bg-gray-900 border border-gray-600 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">
+                                    @error('phone')
+                                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Address -->
+                            <div>
+                                <label for="address" class="block mb-2 text-sm font-medium text-gray-300 uppercase tracking-wider">Address</label>
+                                <textarea id="address" name="address" rows="2" class="bg-gray-900 border border-gray-600 text-white text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">{{ old('address', $user->address) }}</textarea>
+                                @error('address')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- ID CARD (KTP) Upload -->
+                            <!--
+                                CATATAN PENGEMBANG:
+                                - Bagian ini menampilkan preview KTP jika sudah diupload.
+                                - Jika user upload ulang KTP, field `ktp_verified` akan direset ke false.
+                                - Verifikasi akhir dilakukan oleh admin melalui halaman admin user detail.
+                                - Jika ingin mengganti pesan atau proses, ubah di ProfileController::update.
+                            -->
+                            <div>
+                                <label for="id_card" class="block mb-2 text-sm font-medium text-gray-300 uppercase tracking-wider">ID Card (KTP)</label>
+                                @if($user->id_card_path)
+                                    <div class="flex items-center gap-4 mb-2">
+                                        <img src="{{ Storage::url($user->id_card_path) }}" alt="KTP" class="w-32 border rounded">
+                                        <div>
+                                            @if($user->ktp_verified)
+                                                <span class="inline-block bg-green-900 text-green-300 text-xs font-bold px-3 py-1 rounded">Terverifikasi</span>
+                                            @else
+                                                <span class="inline-block bg-yellow-900 text-yellow-300 text-xs font-bold px-3 py-1 rounded">Belum Terverifikasi</span>
+                                            @endif
+                                            <p class="text-xs text-gray-400 mt-2">Jika KTP salah, upload kembali untuk mengirim permintaan verifikasi ulang.</p>
+                                        </div>
+                                    </div>
+                                @endif
+                                <input type="file" id="id_card" name="id_card" accept="image/*" class="block w-full text-sm text-gray-400 bg-gray-900 border border-gray-600 rounded p-2">
+                                <p class="mt-1 text-xs text-gray-500">JPG, PNG (Max. 10MB). Disarankan resolusi jelas untuk verifikasi.</p>
+                                @error('id_card')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
                             </div>

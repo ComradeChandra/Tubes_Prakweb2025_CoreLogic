@@ -58,12 +58,34 @@
                 @error('nik') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
             </div>
 
+                {{-- Phone Input --}}
+                <div>
+                    <label for="phone" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Phone Number</label>
+                    <div class="flex">
+                        <select name="country_code" id="country_code" class="bg-gray-900/50 border border-gray-600 text-white text-sm rounded-l focus:ring-red-500 focus:border-red-500 p-2.5">
+                            <option value="+62">🇮🇩 +62 (ID)</option>
+                            <option value="+65">🇸🇬 +65 (SG)</option>
+                            <option value="+60">🇲🇾 +60 (MY)</option>
+                            <option value="+1">🇺🇸 +1 (US)</option>
+                            <option value="+44">🇬🇧 +44 (UK)</option>
+                            <option value="+81">🇯🇵 +81 (JP)</option>
+                            <option value="+61">🇦🇺 +61 (AU)</option>
+                            <!-- Tambah negara lain sesuai kebutuhan -->
+                        </select>
+                        <input type="text" name="phone" id="phone" required pattern="[0-9]{8,15}" maxlength="15"
+                            class="w-full bg-gray-900/50 border-t border-b border-r border-gray-600 text-white text-sm rounded-r focus:ring-red-500 focus:border-red-500 block p-2.5 placeholder-gray-600"
+                            placeholder="81234567890">
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">Choose country code & enter number (8-15 digits).</p>
+                    @error('phone') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                </div>
+
             {{-- ID Card Upload (KTP) --}}
             <div>
                 <label for="id_card" class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Upload ID Card (KTP)</label>
                 <input type="file" name="id_card" id="id_card" required accept="image/*"
                     class="w-full text-sm text-gray-400 border border-gray-600 rounded cursor-pointer bg-gray-900/50 focus:outline-none">
-                <p class="mt-1 text-xs text-gray-500">JPG, PNG, or PDF (Max. 2MB). Required for verification.</p>
+                <p class="mt-1 text-xs text-gray-500">JPG, PNG, or PDF (Max. 10MB). Required for verification.</p>
                 @error('id_card') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
             </div>
 

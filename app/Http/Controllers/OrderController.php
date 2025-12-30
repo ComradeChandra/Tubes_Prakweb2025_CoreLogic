@@ -10,6 +10,44 @@ use Illuminate\Support\Facades\Auth;
 class OrderController extends Controller
 {
     /**
+     * [USER] Export PDF Order
+     * Route: GET /my-orders/{order}/pdf
+     */
+    public function exportPdf($id)
+    {
+        $order = Order::with(['service', 'user'])->where('user_id', Auth::id())->findOrFail($id);
+        $data = [ 'order' => $order ];
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('users.order_pdf', $data);
+        $filename = 'Order_' . $order->id . '_' . date('Ymd') . '.pdf';
+        return $pdf->download($filename);
+    }
+
+    /**
+     * [USER] DETAIL ORDER (OWNERSHIP CHECK)
+     * Route: GET /my-orders/{order}
+     *
+     * Logika:
+     * - Pastikan order milik user yang sedang login (Auth::id()).
+     * - Jika tidak, kembalikan 404 (security by ownership).
+     * - Tampilkan detail order beserta tombol download PDF (jika diizinkan).
+     */
+    public function showUser($id)
+    {
+        $order = Order::with(['service', 'user'])->where('user_id', Auth::id())->findOrFail($id);
+
+        return view('users.show', compact('order'));
+    }
+
+    /**
+     * [ADMIN] DETAIL ORDER
+     * Route: GET /admin/orders/{order}
+     */
+    public function show($id)
+    {
+        $order = Order::with(['user', 'service'])->findOrFail($id);
+        return view('admin.orders.show', compact('order'));
+    }
+    /**
      * FUNGSI: Proses simpan order baru
      * ROUTE: POST /orders
      * 
@@ -26,8 +64,13 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. VALIDASI INPUT
-        // Pastiin service_id nya beneran ada di tabel services
+        // 1. CEK KTP USER
+        $user = Auth::user();
+        if (!$user->id_card_path || !$user->ktp_verified) {
+            return back()->withErrors(['order' => 'KTP belum diupload atau belum terverifikasi. Silakan upload KTP dan tunggu verifikasi sebelum melakukan order.']);
+        }
+
+        // 2. VALIDASI INPUT
         $validated = $request->validate([
             'service_id' => 'required|exists:services,id',
             'quantity'   => 'required|integer|min:1', 
@@ -39,8 +82,7 @@ class OrderController extends Controller
             'longitude'  => 'nullable|numeric',
         ]);
 
-        // 2. AMBIL DATA SERVICE ASLI DARI DB
-        // Cari unit yang mau dibeli berdasarkan ID
+        // 3. AMBIL DATA SERVICE ASLI DARI DB
         $service = Service::findOrFail($validated['service_id']);
 
         // 3. HITUNG DURASI & TOTAL HARGA

@@ -30,6 +30,10 @@
                     <div class="hidden md:block text-right mr-3">
                         <div class="text-[10px] text-gray-400 uppercase tracking-widest leading-none mb-1">OPERATOR</div>
                         <a href="{{ route('profile.edit') }}" class="text-sm font-bold text-white font-mono uppercase leading-none hover:text-red-500 transition">{{ Auth::user()->name }}</a>
+                        @php $unread = Auth::user()->unreadNotificationsCount(); @endphp
+                        @if($unread > 0)
+                            <div class="text-xs text-yellow-300 mt-1">🔔 {{ $unread }} unread</div>
+                        @endif
                     </div>
                     @if(Auth::user()->role !== 'admin')
                         <a href="{{ route('orders.history') }}" class="text-gray-300 hover:text-white border border-gray-600 hover:bg-gray-700 font-medium rounded text-xs px-3 py-2 uppercase">MY ORDERS</a>
