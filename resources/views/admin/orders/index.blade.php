@@ -92,7 +92,9 @@
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="status" value="APPROVED">
-                                        <button type="submit" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-900 font-medium rounded-lg text-xs px-3 py-2 text-center">
+                                        
+                                        <button type="submit" onclick="this.innerHTML='APPROVING...'; this.disabled=true; this.form.submit();" 
+                                        class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-900 font-medium rounded-lg text-xs px-3 py-2 text-center">
                                             ✓ Accept
                                         </button>
                                     </form>
@@ -102,7 +104,8 @@
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="status" value="REJECTED">
-                                        <button type="submit" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-900 font-medium rounded-lg text-xs px-3 py-2 text-center">
+                                        <button type="submit" onclick="this.innerHTML='REJECTING...'; this.disabled=true; this.form.submit();" 
+                                        class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-900 font-medium rounded-lg text-xs px-3 py-2 text-center">
                                             ✕ Reject
                                         </button>
                                     </form>

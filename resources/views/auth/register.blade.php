@@ -67,7 +67,8 @@
             </div>
 
             {{-- Submit Button --}}
-            <button type="submit" class="w-full text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-900 font-medium rounded-sm text-sm px-5 py-3 text-center tracking-widest shadow-lg shadow-red-900/50 transition-all mt-4">
+            <button type="submit" onclick="this.innerHTML='CREATING ACCOUNT...'; this.disabled=true; this.form.submit();" 
+            class="w-full text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-900 font-medium rounded-sm text-sm px-5 py-3 text-center tracking-widest shadow-lg shadow-red-900/50 transition-all mt-4">
                 CREATE ACCOUNT
             </button>
 
