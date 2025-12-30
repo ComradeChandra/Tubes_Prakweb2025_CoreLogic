@@ -216,6 +216,12 @@ if (app()->environment('local')) {
         $notifications = $customer ? $customer->userNotifications()->count() : 0;
         return response()->json(compact('users','services','orders','notifications'));
     });
+
+    Route::post('/dev/upload', function(\Illuminate\Http\Request $request) {
+        if (! $request->hasFile('file')) return response('No file uploaded', 400);
+        $f = $request->file('file');
+        return response()->json(['size' => $f->getSize(), 'name' => $f->getClientOriginalName()]);
+    });
 }
 
 /*
