@@ -92,9 +92,11 @@ class ServiceController extends Controller
             'category_id' => 'required|exists:categories,id',
             'price'       => 'required|numeric|min:0|max:9999999999.99',
             'description' => 'required|min:10',
+            'unit_size'   => 'nullable|integer|min:1',
+            'unit_description' => 'nullable|string|max:255',
             'status'      => 'nullable|in:available,deployed,maintenance',
-            'image'       => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048', // Max 2MB
-            'carousel_images.*' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'image'       => 'nullable|image|mimes:jpeg,jpg,png,webp|max:10240', // Max 10MB
+            'carousel_images.*' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:10240',
         ], [
             // Custom error messages biar user ngerti salahnya dimana
             'name.required'        => 'Nama unit wajib diisi.',
@@ -110,10 +112,10 @@ class ServiceController extends Controller
             'status.in'            => 'Status tidak valid.',
             'image.image'          => 'File thumbnail harus berupa gambar.',
             'image.mimes'          => 'Format thumbnail harus JPG, JPEG, PNG, atau WebP.',
-            'image.max'            => 'Ukuran thumbnail maksimal 2MB.',
+            'image.max'            => 'Ukuran thumbnail maksimal 10MB.',
             'carousel_images.*.image' => 'File carousel harus berupa gambar.',
             'carousel_images.*.mimes' => 'Format carousel harus JPG, JPEG, PNG, atau WebP.',
-            'carousel_images.*.max'   => 'Ukuran carousel maksimal 2MB.',
+            'carousel_images.*.max'   => 'Ukuran carousel maksimal 10MB.',
         ]);
 
         // Default status kalau kosong = available
@@ -215,9 +217,11 @@ class ServiceController extends Controller
             'category_id' => 'required|exists:categories,id',
             'price'       => 'required|numeric|min:0|max:9999999999.99',
             'description' => 'required|min:10',
+            'unit_size'   => 'nullable|integer|min:1',
+            'unit_description' => 'nullable|string|max:255',
             'status'      => 'required|in:available,deployed,maintenance',
-            'image'       => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
-            'carousel_images.*' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'image'       => 'nullable|image|mimes:jpeg,jpg,png|max:10240',
+            'carousel_images.*' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:10240',
         ], [
             'name.required'        => 'Nama unit wajib diisi.',
             'name.unique'          => 'Nama unit sudah digunakan unit lain.',
@@ -233,10 +237,10 @@ class ServiceController extends Controller
             'status.in'            => 'Status tidak valid.',
             'image.image'          => 'File thumbnail harus berupa gambar.',
             'image.mimes'          => 'Format thumbnail harus JPG, JPEG, PNG, atau WebP.',
-            'image.max'            => 'Ukuran thumbnail maksimal 2MB.',
+            'image.max'            => 'Ukuran thumbnail maksimal 10MB.',
             'carousel_images.*.image' => 'File carousel harus berupa gambar.',
             'carousel_images.*.mimes' => 'Format carousel harus JPG, JPEG, PNG, atau WebP.',
-            'carousel_images.*.max'   => 'Ukuran carousel maksimal 2MB.',
+            'carousel_images.*.max'   => 'Ukuran carousel maksimal 10MB.',
         ]);
 
         // STEP 3: HANDLE UPLOAD FOTO THUMBNAIL BARU (KALAU ADA)
@@ -364,7 +368,7 @@ class ServiceController extends Controller
        - Pake loop `foreach` buat nyimpen satu-satu ke tabel `service_images`.
     
     2. SOAL VALIDASI:
-       - Validasi udah lumayan ketat. File harus gambar (jpg/png/webp) dan max 2MB.
+       - Validasi udah lumayan ketat. File harus gambar (jpg/png/webp) dan max 10MB.
        - Kalo user bandel upload file .exe atau .php, bakal ditolak mentah-mentah.
     
     3. FITUR HAPUS GAMBAR:

@@ -50,6 +50,11 @@
                             $ {{ number_format($service->price, 2, '.', ',') }}
                         </span>
                     </div>
+
+                    {{-- Jelaskan arti harga dan unit supaya user tidak bingung --}}
+                    <div class="mt-2">
+                        <p class="text-xs text-gray-400">Harga di atas adalah <strong>harga per unit per minggu</strong>. <em>Satu unit</em> berarti: <strong>{{ $service->unit_description ?? ($service->unit_size . ' personel per unit') }}</strong>.</p>
+                    </div>
                 </div>
 
                 <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-lg">
@@ -57,6 +62,10 @@
                     <p class="text-gray-300 leading-relaxed text-lg">
                         {{ $service->description }}
                     </p>
+
+                    @if($service->unit_description)
+                        <p class="text-sm text-gray-400 mt-3">Info Unit: {{ $service->unit_description }}</p>
+                    @endif
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4 pt-4">

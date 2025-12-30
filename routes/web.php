@@ -82,9 +82,19 @@ Route::middleware(['auth'])->group(function () {
     // Halaman History Order User
     Route::get('/my-orders', [OrderController::class, 'history'])->name('orders.history');
 
+    // Route: Show order detail (USER)
+    // Catatan: Pastikan route ini didefinisikan sebelum route PDF yang lebih spesifik
+    Route::get('/my-orders/{order}', [OrderController::class, 'showUser'])->name('orders.show');
+
+    // Export PDF Order User
+    Route::get('/my-orders/{order}/pdf', [OrderController::class, 'exportPdf'])->name('orders.exportPdf');
+
     // --- USER PROFILE (NEW SPRINT 3) ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // Notifications (mark read)
+    Route::post('/notifications/mark-read', [ProfileController::class, 'markNotificationsRead'])->name('notifications.markRead');
 
 });
 
@@ -142,11 +152,19 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Admin bisa liat list order & update status (Approve/Reject)
     Route::get('admin/orders', [OrderController::class, 'indexAdmin'])->name('admin.orders.index');
     Route::patch('admin/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
+    Route::get('admin/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
     // --- MANAGE USERS (NEW) ---
     // Admin bisa liat list user, detail, dan hapus user
     Route::resource('admin/users', UserController::class)
          ->names('admin.users')
          ->only(['index', 'show', 'destroy']);
+
+    // Admin actions for KTP verification
+    // Catatan: Route ini dipakai oleh halaman admin (User details) untuk menandai KTP
+    // sebagai terverifikasi atau tidak. Setelah tindakan, user akan menerima notifikasi
+    // singkat di halaman profil mereka.
+    Route::patch('admin/users/{user}/verify-ktp', [UserController::class, 'verifyKtp'])->name('admin.users.verifyKtp');
+    Route::patch('admin/users/{user}/unverify-ktp', [UserController::class, 'unverifyKtp'])->name('admin.users.unverifyKtp');
 
     // ===== EXPORT LAPORAN PDF =====
     // Download laporan penjualan bulanan dalam format PDF

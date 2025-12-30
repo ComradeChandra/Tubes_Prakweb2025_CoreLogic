@@ -4,6 +4,17 @@
 <section class="bg-gray-900 py-20 min-h-screen">
     <div class="max-w-3xl mx-auto px-6 text-white text-center">
 
+        {{-- TAMPILKAN ERROR FLASH MESSAGE JIKA ADA --}}
+        @if ($errors->any())
+            <div class="mb-6 bg-red-800/80 border border-red-600 text-red-100 rounded p-4 text-left">
+                <ul class="list-disc pl-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <h1 class="text-3xl font-extrabold mb-6">
             Confirm Your Order
         </h1>
@@ -31,12 +42,13 @@
             <!-- ID Service (Hidden) biar backend tau unit apa yg dibeli -->
             <input type="hidden" name="service_id" value="{{ $service->id }}">
 
-            <!-- Input Quantity -->
-            <div class="mb-4 text-left">
-                <label class="block text-sm font-bold mb-2">Quantity (Personel/Unit)</label>
-                <input type="number" name="quantity" value="1" min="1" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:border-red-500 focus:outline-none">
-            </div>
-
+                        <!-- Input Quantity -->
+                        <div class="mb-4 text-left">
+                            <label class="block text-sm font-bold mb-2">Quantity (Units)</label>
+                            <div class="text-xs text-gray-400 mb-2">{{ $service->unit_description ?? ($service->unit_size . ' personel per unit') }}</div>
+                            <input type="number" name="quantity" value="{{ old('quantity', 1) }}" min="1" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:border-red-500 focus:outline-none">
+                            @error('quantity') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                        </div>
             <!-- Input Date Range (Added by Chandra) -->
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div class="text-left">
@@ -81,7 +93,8 @@
             <!-- Input Notes -->
             <div class="mb-6 text-left">
                 <label class="block text-sm font-bold mb-2">Mission Notes (Optional)</label>
-                <textarea name="notes" rows="3" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:border-red-500 focus:outline-none" placeholder="Specific requirements..."></textarea>
+                <textarea name="notes" rows="3" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:border-red-500 focus:outline-none" placeholder="Specific requirements...">{{ old('notes') }}</textarea>
+                @error('notes') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
             </div>
 
             <!-- Leaflet CSS & JS -->

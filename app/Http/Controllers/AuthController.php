@@ -85,9 +85,11 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:8|confirmed', // confirmed biar ngecek password sama confirm_password sama
-            'nik' => 'required|numeric|digits:16', // NIK wajib 16 digit
-            'id_card' => 'required|image|max:2048', // Wajib upload KTP, max 2MB
+            'password' => 'required|min:8|confirmed',
+            'nik' => 'required|numeric|digits:16',
+            'id_card' => 'required|image|max:10240', // Max 10MB
+            'country_code' => 'required|string',
+            'phone' => 'required|numeric|digits_between:8,15',
         ], [
             'name.required' => 'Please enter your full name.',
             'name.max' => 'Name must not exceed 255 characters.',
@@ -101,13 +103,16 @@ class AuthController extends Controller
             'nik.digits' => 'NIK must be exactly 16 digits.',
             'id_card.required' => 'ID Card photo is required.',
             'id_card.image' => 'File must be an image.',
-            'id_card.max' => 'Image size must not exceed 2MB.'
+            'id_card.max' => 'Image size must not exceed 10MB.',
+            'country_code.required' => 'Please select a country code.',
+            'phone.required' => 'Phone number is required.',
+            'phone.numeric' => 'Phone number must be numeric.',
+            'phone.digits_between' => 'Phone number must be between 8 and 15 digits.'
         ]);
 
         // Handle File Upload
         $idCardPath = null;
         if ($request->hasFile('id_card')) {
-            // Simpan di folder 'storage/app/public/id_cards'
             $idCardPath = $request->file('id_card')->store('id_cards', 'public');
         }
 
@@ -122,15 +127,19 @@ class AuthController extends Controller
         // Gabungin jadi username: contoh "chandra.123"
         $usernameJadi = $namaDepan . "." . $angkaRandom;
 
+        // Gabung country code dan phone
+        $fullPhone = $request->country_code . $request->phone;
+
         // Simpan ke database
         User::create([
             'name' => $request->name,
             'email' => $request->email,
             'username' => $usernameJadi,
-            'password' => Hash::make($request->password), // Jangan lupa di-hash!
+            'password' => Hash::make($request->password),
             'nik' => $request->nik,
-            'id_card_path' => $idCardPath, // Simpan path KTP
-            'role' => 'customer' // Default user biasa
+            'id_card_path' => $idCardPath,
+            'phone' => $fullPhone,
+            'role' => 'customer'
         ]);
 
         // Langsung login aja biar cepet, gak usah suruh login ulang

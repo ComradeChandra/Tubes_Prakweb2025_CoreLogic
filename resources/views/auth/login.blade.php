@@ -89,6 +89,7 @@
 
                 <!-- TOMBOL LOGIN -->
                 <button type="submit" 
+                    aria-label="Secure Login Button"
                     onclick="this.innerHTML='LOGGING IN...'; this.disabled=true; this.form.submit();"
                     class="w-full text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-900 font-bold rounded text-sm px-5 py-3 text-center transition-all tracking-widest uppercase shadow-lg shadow-red-900/50">
                     Secure Login

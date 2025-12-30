@@ -74,7 +74,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'Eastern Wolves - Platinum Package',
             'slug' => 'eastern-wolves-platinum',
             'price' => 25000.00, 
-            'description' => 'Elite Private Security Unit equipped with Eastern European gear (AK-12, PKM). Specializes in Urban Security and Proactive Protection.',
+            'description' => 'Elite Private Security Unit specialized in close protection and proactive urban security. Includes threat assessment, armored response, and specially trained operators.',
+            'unit_size' => 3,
+            'unit_description' => '1 unit = 3 highly trained operators (team leader + 2 operatives)',
             'status' => 'available',
         ]);
 
@@ -84,7 +86,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'Blackgold Team - Gold Package',
             'slug' => 'blackgold-team-gold',
             'price' => 18500.00,
-            'description' => 'NATO standard Private Security Unit (M4A1, Glock). Highly disciplined, suitable for corporate escorts.',
+            'description' => 'NATO-standard security unit for executive escorts and corporate details. Focus on visible deterrence, route clearance, and close protection.',
+            'unit_size' => 2,
+            'unit_description' => '1 unit = 2 operators (team leader + support)',
             'status' => 'available',
         ]);
 
@@ -94,7 +98,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'K-9 Handler & Trainer',
             'slug' => 'k9-handler-trainer',
             'price' => 2500.00,
-            'description' => 'Professional handlers with K-9 units for hazard detection and site safety.', 
+            'description' => 'Professional handlers with K-9 units for hazard detection, explosive search, and enhanced perimeter security. Ideal as single-handler deployments.', 
+            'unit_size' => 1,
+            'unit_description' => '1 unit = 1 handler + 1 K-9',
             'status' => 'available',
         ]);
 
@@ -104,7 +110,10 @@ class DatabaseSeeder extends Seeder
             'name' => 'Armored VIP Escort (City)',
             'slug' => 'armored-vip-escort',
             'price' => 5000.00,
-            'description' => 'Luxury sedan with B6-level protection. Certified defensive drivers.', 
+            'description' => 'Armored vehicle convoy for VIP transit within urban areas. Includes driver and protective detail for immediate response.', 
+            'unit_size' => 2,
+            'unit_description' => '1 unit = 2 personnel (driver + close protection officer)',
+            'status' => 'available',
         ]);
 
         // --- APC ESCORT ---
@@ -123,7 +132,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'CoreLogic StatSec Unit',
             'slug' => 'corelogic-statsec',
             'price' => 800.00,
-            'description' => 'Unit penjagaan statis untuk Bank/Gedung. Armor Ringan & Shotgun.',
+            'description' => 'Static guarding unit for commercial and financial facilities. Trained in access control, surveillance, and rapid local response.',
+            'unit_size' => 1,
+            'unit_description' => '1 unit = 1 posted guard per shift',
             'status' => 'available',
         ]);
 
