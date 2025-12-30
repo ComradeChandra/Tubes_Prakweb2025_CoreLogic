@@ -98,6 +98,7 @@
     <li class="mb-4"><a href="/" class="hover:text-red-500 transition">Terms of Engagement</a></li>
     <li><a href="/" class="hover:text-red-500 transition">Liability Waiver</a></li>
 </ul>
+
                   </div>
                   <div>
                       <h2 class="mb-6 text-sm font-semibold text-white uppercase tracking-wider">Secure Contact</h2>
@@ -114,6 +115,7 @@
 <span class="text-sm text-gray-500 sm:text-center">
 &copy; 2025 CoreLogic Defense. All Rights Reserved.
 </span>
+
                 <div class="flex mt-4 sm:justify-center sm:mt-0 space-x-4">
                     <span class="text-gray-600 text-xs uppercase tracking-widest border border-gray-600 px-2 py-1 rounded">Secured by 256-bit AES</span>
                 </div>
