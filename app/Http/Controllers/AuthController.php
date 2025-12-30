@@ -23,6 +23,9 @@ class AuthController extends Controller
         $request->validate([
             'login_identifier' => 'required',
             'password' => 'required'
+        ], [
+            'login_identifier.required' => 'Please provide your email or username.',
+            'password.required' => 'Password is required to proceed.'
         ]);
 
         // 2. Cek ini Email atau Username?
@@ -65,7 +68,7 @@ class AuthController extends Controller
         // Kalo gagal login (password salah atau user gak ada)
         // Balikin lagi ke halaman login
         return back()->withErrors([
-            'login_identifier' => 'Password atau Akun salah bro, coba lagi.',
+            'login_identifier' => 'Invalid credentials. Please check your email/username and password.',
         ]);
     }
 
@@ -85,6 +88,20 @@ class AuthController extends Controller
             'password' => 'required|min:8|confirmed', // confirmed biar ngecek password sama confirm_password sama
             'nik' => 'required|numeric|digits:16', // NIK wajib 16 digit
             'id_card' => 'required|image|max:2048', // Wajib upload KTP, max 2MB
+        ], [
+            'name.required' => 'Please enter your full name.',
+            'name.max' => 'Name must not exceed 255 characters.',
+            'email.required' => 'Please provide a valid email address.',
+            'email.email' => 'The email format is invalid.',
+            'email.unique' => 'This email address is already registered.',
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password requires at least 8 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
+            'nik.required' => 'National ID (NIK) is required.',
+            'nik.digits' => 'NIK must be exactly 16 digits.',
+            'id_card.required' => 'ID Card photo is required.',
+            'id_card.image' => 'File must be an image.',
+            'id_card.max' => 'Image size must not exceed 2MB.'
         ]);
 
         // Handle File Upload
@@ -124,7 +141,7 @@ class AuthController extends Controller
         
         Auth::attempt($credentials);
 
-        return redirect('/')->with('success', 'Mantap, udah terdaftar!');
+        return redirect('/')->with('success', 'Registration successful. Welcome aboard!');
     }
 
     // LOGOUT

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoreLogic Security Solutions</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet" />
     <style>
@@ -51,7 +52,10 @@
           <ul class="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-700 rounded-lg bg-gray-800 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-gray-900 items-center">
             <li><a href="/" class="block py-2 px-3 text-white bg-red-700 md:bg-transparent md:text-red-500 md:p-0">HOME</a></li>
             <li><a href="/catalog" class="block py-2 px-3 text-gray-300 hover:bg-gray-700 md:hover:bg-transparent md:hover:text-red-500 md:p-0">CATALOG</a></li>
-            <li><a href="#" class="block py-2 px-3 text-gray-300 hover:bg-gray-700 md:hover:bg-transparent md:hover:text-red-500 md:p-0">CONTACT</a></li>
+<li><a href="https://wa.me/628123456789"
+     target="_blank"
+     class="block py-2 px-3 text-gray-300 hover:bg-gray-700 md:hover:bg-transparent md:hover:text-red-500 md:p-0">
+     CONTACT</a></li>
             @auth
                 @if(Auth::user()->role === 'admin')
                     <li><a href="{{ route('admin.dashboard') }}" class="block py-2 px-3 text-red-500 font-bold border border-red-500 rounded hover:bg-red-900/20 md:border-0 md:hover:text-red-400 md:p-0 uppercase tracking-wider">⚠ ADMIN PANEL</a></li>
@@ -89,12 +93,12 @@
                       </ul>
                   </div>
                   <div>
-                      <h2 class="mb-6 text-sm font-semibold text-white uppercase tracking-wider">Legal</h2>
-                      <ul class="text-gray-400 font-medium">
-                          <li class="mb-4"><a href="#" class="hover:text-red-500 transition">Privacy Policy</a></li>
-                          <li class="mb-4"><a href="#" class="hover:text-red-500 transition">Terms of Engagement</a></li>
-                          <li><a href="#" class="hover:text-red-500 transition">Liability Waiver</a></li>
-                      </ul>
+                     <ul class="text-gray-400 font-medium">
+    <li class="mb-4"><a href="/" class="hover:text-red-500 transition">Privacy Policy</a></li>
+    <li class="mb-4"><a href="/" class="hover:text-red-500 transition">Terms of Engagement</a></li>
+    <li><a href="/" class="hover:text-red-500 transition">Liability Waiver</a></li>
+</ul>
+
                   </div>
                   <div>
                       <h2 class="mb-6 text-sm font-semibold text-white uppercase tracking-wider">Secure Contact</h2>
@@ -108,7 +112,10 @@
             </div>
             <hr class="my-6 border-gray-700 sm:mx-auto lg:my-8" />
             <div class="sm:flex sm:items-center sm:justify-between">
-                <span class="text-sm text-gray-500 sm:text-center">© 2025 <a href="/" class="hover:underline text-red-500">CoreLogic Security Solutions™</a>. All Rights Reserved.</span>
+<span class="text-sm text-gray-500 sm:text-center">
+&copy; 2025 CoreLogic Defense. All Rights Reserved.
+</span>
+
                 <div class="flex mt-4 sm:justify-center sm:mt-0 space-x-4">
                     <span class="text-gray-600 text-xs uppercase tracking-widest border border-gray-600 px-2 py-1 rounded">Secured by 256-bit AES</span>
                 </div>

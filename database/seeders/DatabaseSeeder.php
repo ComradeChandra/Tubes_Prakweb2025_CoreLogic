@@ -141,6 +141,92 @@ class DatabaseSeeder extends Seeder
             'description' => 'Advanced digital asset protection unit. Specializes in counter-surveillance, encrypted communication channels, and neutralizing cyber threats before they manifest physically.',
             'status' => 'available',
         ]);
+
+        // --- KATEGORI VIP ESCORT ---
+        $catVIP = Category::create([
+            'name' => 'VIP Escort',
+            'slug' => 'vip-escort'
+        ]);
+
+        // --- MARITIME SECURITY DETAIL ---
+        Service::create([
+            'category_id' => $catTransport->id,
+            'name' => 'Maritime Security Detail',
+            'slug' => 'maritime-security-detail',
+            'price' => 22000.00,
+            'description' => 'Professional maritime security team for vessel protection, anti-piracy operations, and offshore facility guarding. Equipped with naval communication systems.',
+            'status' => 'available',
+        ]);
+
+        // --- DRONE SURVEILLANCE UNIT ---
+        Service::create([
+            'category_id' => $catCyber->id,
+            'name' => 'Drone Surveillance Unit',
+            'slug' => 'drone-surveillance-unit',
+            'price' => 8500.00,
+            'description' => 'Advanced UAV surveillance with thermal imaging and real-time monitoring. Ideal for perimeter security and reconnaissance missions.',
+            'status' => 'available',
+        ]);
+
+        // --- VVIP CLOSE PROTECTION ---
+        Service::create([
+            'category_id' => $catVIP->id,
+            'name' => 'VVIP Close Protection',
+            'slug' => 'vvip-close-protection',
+            'price' => 35000.00,
+            'description' => 'Elite executive protection team trained in international standards. Includes threat assessment, route planning, and 24/7 personal security detail.',
+            'status' => 'available',
+        ]);
+
+        // --- RIOT CONTROL SQUAD ---
+        Service::create([
+            'category_id' => $catStatic->id,
+            'name' => 'Riot Control Squad',
+            'slug' => 'riot-control-squad',
+            'price' => 9500.00,
+            'description' => 'Specialized crowd management unit equipped with non-lethal deterrents. Trained in de-escalation tactics and mass event security.',
+            'status' => 'available',
+        ]);
+
+        // --- EXECUTIVE HELICOPTER TRANSPORT ---
+        Service::create([
+            'category_id' => $catVIP->id,
+            'name' => 'Executive Helicopter Transport',
+            'slug' => 'executive-helicopter-transport',
+            'price' => 45000.00,
+            'description' => 'Luxury aerial transport with armed escort. Includes pilot, co-pilot, and two armed security personnel. Perfect for high-risk area evacuations.',
+            'status' => 'available',
+        ]);
+
+        // --- EXPLOSIVE ORDNANCE DISPOSAL ---
+        Service::create([
+            'category_id' => $catTraining->id,
+            'name' => 'Explosive Ordnance Disposal Team',
+            'slug' => 'explosive-ordnance-disposal',
+            'price' => 28000.00,
+            'description' => 'Certified EOD specialists for threat detection and neutralization. Equipped with bomb suits, X-ray scanners, and remote disposal robots.',
+            'status' => 'available',
+        ]);
+
+        // --- DIGNITARY MOTORCADE COORDINATION ---
+        Service::create([
+            'category_id' => $catVIP->id,
+            'name' => 'Dignitary Motorcade Coordination',
+            'slug' => 'dignitary-motorcade-coordination',
+            'price' => 18500.00,
+            'description' => 'Full motorcade service with route sweeping, advance security teams, and multiple armored vehicles. Suitable for political figures and foreign delegates.',
+            'status' => 'available',
+        ]);
+
+        // --- HOSTILE ENVIRONMENT TRAINING ---
+        Service::create([
+            'category_id' => $catTraining->id,
+            'name' => 'Hostile Environment Training Program',
+            'slug' => 'hostile-environment-training',
+            'price' => 12000.00,
+            'description' => 'Comprehensive 5-day training for personnel operating in high-risk zones. Includes first aid, ambush response, and emergency extraction protocols.',
+            'status' => 'available',
+        ]);
     }
 }
 
