@@ -92,12 +92,11 @@
                       </ul>
                   </div>
                   <div>
-                      <h2 class="mb-6 text-sm font-semibold text-white uppercase tracking-wider">Legal</h2>
-                      <ul class="text-gray-400 font-medium">
-                          <li class="mb-4"><a href="#" class="hover:text-red-500 transition">Privacy Policy</a></li>
-                          <li class="mb-4"><a href="#" class="hover:text-red-500 transition">Terms of Engagement</a></li>
-                          <li><a href="#" class="hover:text-red-500 transition">Liability Waiver</a></li>
-                      </ul>
+                     <ul class="text-gray-400 font-medium">
+    <li class="mb-4"><a href="/" class="hover:text-red-500 transition">Privacy Policy</a></li>
+    <li class="mb-4"><a href="/" class="hover:text-red-500 transition">Terms of Engagement</a></li>
+    <li><a href="/" class="hover:text-red-500 transition">Liability Waiver</a></li>
+</ul>
                   </div>
                   <div>
                       <h2 class="mb-6 text-sm font-semibold text-white uppercase tracking-wider">Secure Contact</h2>
@@ -111,7 +110,9 @@
             </div>
             <hr class="my-6 border-gray-700 sm:mx-auto lg:my-8" />
             <div class="sm:flex sm:items-center sm:justify-between">
-                <span class="text-sm text-gray-500 sm:text-center">© 2025 <a href="/" class="hover:underline text-red-500">CoreLogic Security Solutions™</a>. All Rights Reserved.</span>
+<span class="text-sm text-gray-500 sm:text-center">
+&copy; 2025 CoreLogic Defense. All Rights Reserved.
+</span>
                 <div class="flex mt-4 sm:justify-center sm:mt-0 space-x-4">
                     <span class="text-gray-600 text-xs uppercase tracking-widest border border-gray-600 px-2 py-1 rounded">Secured by 256-bit AES</span>
                 </div>
