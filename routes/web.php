@@ -207,6 +207,15 @@ if (app()->environment('local')) {
 
         return response()->json(['order_id' => $order->id, 'total_price' => $order->total_price]);
     });
+
+    Route::get('/dev/debug', function() {
+        $users = \App\Models\User::count();
+        $services = \App\Models\Service::count();
+        $orders = \App\Models\Order::count();
+        $customer = \App\Models\User::where('email','customer@test.com')->first();
+        $notifications = $customer ? $customer->userNotifications()->count() : 0;
+        return response()->json(compact('users','services','orders','notifications'));
+    });
 }
 
 /*
