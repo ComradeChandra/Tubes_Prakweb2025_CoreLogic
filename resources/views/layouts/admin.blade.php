@@ -117,6 +117,17 @@
                     </a>
                 </li>
 
+                {{-- Menu Users --}}
+                <li>
+                    <a href="{{ route('admin.users.index') }}"
+                        class="flex items-center p-2 {{ request()->routeIs('admin.users.*') ? 'bg-red-600 text-white' : 'text-gray-300 hover:bg-gray-700' }} rounded-lg group">
+                        <svg class="w-5 h-5 transition duration-75" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="ml-3">Manage Users</span>
+                    </a>
+                </li>
+
                 <li class="pt-4 mt-4 space-y-2 border-t border-gray-700">
                     <span class="text-xs font-semibold text-gray-500 uppercase">Shortcut</span>
                 </li>

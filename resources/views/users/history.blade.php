@@ -57,11 +57,9 @@
                                             {{ Str::limit($order->notes, 30) ?? '-' }}
                                         </td>
                                         <td class="px-6 py-4">
-                                            @if($order->status == 'APPROVED')
-                                                <a href="#" class="font-medium text-blue-500 hover:underline">📄 Invoice</a>
-                                            @else
-                                                <span class="text-gray-600">-</span>
-                                            @endif
+                                            <a href="{{ route('orders.show', $order->id) }}" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold px-3 py-2 rounded shadow transition mr-2">Detail</a>
+
+                                            <a href="{{ route('orders.exportPdf', $order->id) }}" target="_blank" class="bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold px-3 py-2 rounded shadow transition">Download PDF</a>
                                         </td>
                                     </tr>
                                 @endforeach

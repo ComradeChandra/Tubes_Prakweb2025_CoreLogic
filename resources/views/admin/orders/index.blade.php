@@ -85,31 +85,35 @@
 
                         <!-- ACTION BUTTONS -->
                         <td class="px-6 py-4 text-center">
-                            @if($order->status == 'PENDING')
-                                <div class="flex justify-center gap-2">
-                                    <!-- APPROVE FORM -->
-                                    <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" onsubmit="return confirm('Approve this mission?');">
-                                        @csrf
-                                        @method('PATCH')
-                                        <input type="hidden" name="status" value="APPROVED">
-                                        <button type="submit" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-900 font-medium rounded-lg text-xs px-3 py-2 text-center">
-                                            ✓ Accept
-                                        </button>
-                                    </form>
-
-                                    <!-- REJECT FORM -->
-                                    <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" onsubmit="return confirm('Reject this mission?');">
-                                        @csrf
-                                        @method('PATCH')
-                                        <input type="hidden" name="status" value="REJECTED">
-                                        <button type="submit" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-900 font-medium rounded-lg text-xs px-3 py-2 text-center">
-                                            ✕ Reject
-                                        </button>
-                                    </form>
-                                </div>
-                            @else
-                                <span class="text-gray-500 text-xs italic">No Action</span>
-                            @endif
+                            <div class="flex flex-col gap-2 items-center">
+                                <a href="{{ route('admin.orders.show', $order->id) }}" class="bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold px-4 py-2 rounded shadow transition mb-1">Detail</a>
+                                @if($order->status == 'PENDING')
+                                    <div class="flex justify-center gap-2">
+                                        <!-- APPROVE FORM -->
+                                        <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" onsubmit="return confirm('Approve this mission?');">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="status" value="APPROVED">
+                                            <button type="submit" onclick="this.innerHTML='APPROVING...'; this.disabled=true; this.form.submit();" 
+                                            class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-900 font-medium rounded-lg text-xs px-3 py-2 text-center">
+                                                ✓ Accept
+                                            </button>
+                                        </form>
+                                        <!-- REJECT FORM -->
+                                        <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" onsubmit="return confirm('Reject this mission?');">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="status" value="REJECTED">
+                                            <button type="submit" onclick="this.innerHTML='REJECTING...'; this.disabled=true; this.form.submit();" 
+                                            class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-900 font-medium rounded-lg text-xs px-3 py-2 text-center">
+                                                ✕ Reject
+                                            </button>
+                                        </form>
+                                    </div>
+                                @else
+                                    <span class="text-gray-500 text-xs italic">No Action</span>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @empty

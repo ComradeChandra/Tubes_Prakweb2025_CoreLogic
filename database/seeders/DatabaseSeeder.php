@@ -74,7 +74,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'Eastern Wolves - Platinum Package',
             'slug' => 'eastern-wolves-platinum',
             'price' => 25000.00, 
-            'description' => 'Elite Private Security Unit equipped with Eastern European gear (AK-12, PKM). Specializes in Urban Security and Proactive Protection.',
+            'description' => 'Elite Private Security Unit specialized in close protection and proactive urban security. Includes threat assessment, armored response, and specially trained operators.',
+            'unit_size' => 3,
+            'unit_description' => '1 unit = 3 highly trained operators (team leader + 2 operatives)',
             'status' => 'available',
         ]);
 
@@ -84,7 +86,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'Blackgold Team - Gold Package',
             'slug' => 'blackgold-team-gold',
             'price' => 18500.00,
-            'description' => 'NATO standard Private Security Unit (M4A1, Glock). Highly disciplined, suitable for corporate escorts.',
+            'description' => 'NATO-standard security unit for executive escorts and corporate details. Focus on visible deterrence, route clearance, and close protection.',
+            'unit_size' => 2,
+            'unit_description' => '1 unit = 2 operators (team leader + support)',
             'status' => 'available',
         ]);
 
@@ -94,7 +98,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'K-9 Handler & Trainer',
             'slug' => 'k9-handler-trainer',
             'price' => 2500.00,
-            'description' => 'Professional handlers with K-9 units for hazard detection and site safety.', 
+            'description' => 'Professional handlers with K-9 units for hazard detection, explosive search, and enhanced perimeter security. Ideal as single-handler deployments.', 
+            'unit_size' => 1,
+            'unit_description' => '1 unit = 1 handler + 1 K-9',
             'status' => 'available',
         ]);
 
@@ -104,7 +110,10 @@ class DatabaseSeeder extends Seeder
             'name' => 'Armored VIP Escort (City)',
             'slug' => 'armored-vip-escort',
             'price' => 5000.00,
-            'description' => 'Luxury sedan with B6-level protection. Certified defensive drivers.', 
+            'description' => 'Armored vehicle convoy for VIP transit within urban areas. Includes driver and protective detail for immediate response.', 
+            'unit_size' => 2,
+            'unit_description' => '1 unit = 2 personnel (driver + close protection officer)',
+            'status' => 'available',
         ]);
 
         // --- APC ESCORT ---
@@ -123,7 +132,110 @@ class DatabaseSeeder extends Seeder
             'name' => 'CoreLogic StatSec Unit',
             'slug' => 'corelogic-statsec',
             'price' => 800.00,
-            'description' => 'Unit penjagaan statis untuk Bank/Gedung. Armor Ringan & Shotgun.',
+            'description' => 'Static guarding unit for commercial and financial facilities. Trained in access control, surveillance, and rapid local response.',
+            'unit_size' => 1,
+            'unit_description' => '1 unit = 1 posted guard per shift',
+            'status' => 'available',
+        ]);
+
+        // --- CYBER SECURITY DIVISION (NEW) ---
+        $catCyber = Category::create([
+            'name' => 'Cyber Intelligence',
+            'slug' => 'cyber-intelligence'
+        ]);
+
+        Service::create([
+            'category_id' => $catCyber->id,
+            'name' => 'Cyber Security Division',
+            'slug' => 'cyber-security-division',
+            'price' => 15000.00,
+            'description' => 'Advanced digital asset protection unit. Specializes in counter-surveillance, encrypted communication channels, and neutralizing cyber threats before they manifest physically.',
+            'status' => 'available',
+        ]);
+
+        // --- KATEGORI VIP ESCORT ---
+        $catVIP = Category::create([
+            'name' => 'VIP Escort',
+            'slug' => 'vip-escort'
+        ]);
+
+        // --- MARITIME SECURITY DETAIL ---
+        Service::create([
+            'category_id' => $catTransport->id,
+            'name' => 'Maritime Security Detail',
+            'slug' => 'maritime-security-detail',
+            'price' => 22000.00,
+            'description' => 'Professional maritime security team for vessel protection, anti-piracy operations, and offshore facility guarding. Equipped with naval communication systems.',
+            'status' => 'available',
+        ]);
+
+        // --- DRONE SURVEILLANCE UNIT ---
+        Service::create([
+            'category_id' => $catCyber->id,
+            'name' => 'Drone Surveillance Unit',
+            'slug' => 'drone-surveillance-unit',
+            'price' => 8500.00,
+            'description' => 'Advanced UAV surveillance with thermal imaging and real-time monitoring. Ideal for perimeter security and reconnaissance missions.',
+            'status' => 'available',
+        ]);
+
+        // --- VVIP CLOSE PROTECTION ---
+        Service::create([
+            'category_id' => $catVIP->id,
+            'name' => 'VVIP Close Protection',
+            'slug' => 'vvip-close-protection',
+            'price' => 35000.00,
+            'description' => 'Elite executive protection team trained in international standards. Includes threat assessment, route planning, and 24/7 personal security detail.',
+            'status' => 'available',
+        ]);
+
+        // --- RIOT CONTROL SQUAD ---
+        Service::create([
+            'category_id' => $catStatic->id,
+            'name' => 'Riot Control Squad',
+            'slug' => 'riot-control-squad',
+            'price' => 9500.00,
+            'description' => 'Specialized crowd management unit equipped with non-lethal deterrents. Trained in de-escalation tactics and mass event security.',
+            'status' => 'available',
+        ]);
+
+        // --- EXECUTIVE HELICOPTER TRANSPORT ---
+        Service::create([
+            'category_id' => $catVIP->id,
+            'name' => 'Executive Helicopter Transport',
+            'slug' => 'executive-helicopter-transport',
+            'price' => 45000.00,
+            'description' => 'Luxury aerial transport with armed escort. Includes pilot, co-pilot, and two armed security personnel. Perfect for high-risk area evacuations.',
+            'status' => 'available',
+        ]);
+
+        // --- EXPLOSIVE ORDNANCE DISPOSAL ---
+        Service::create([
+            'category_id' => $catTraining->id,
+            'name' => 'Explosive Ordnance Disposal Team',
+            'slug' => 'explosive-ordnance-disposal',
+            'price' => 28000.00,
+            'description' => 'Certified EOD specialists for threat detection and neutralization. Equipped with bomb suits, X-ray scanners, and remote disposal robots.',
+            'status' => 'available',
+        ]);
+
+        // --- DIGNITARY MOTORCADE COORDINATION ---
+        Service::create([
+            'category_id' => $catVIP->id,
+            'name' => 'Dignitary Motorcade Coordination',
+            'slug' => 'dignitary-motorcade-coordination',
+            'price' => 18500.00,
+            'description' => 'Full motorcade service with route sweeping, advance security teams, and multiple armored vehicles. Suitable for political figures and foreign delegates.',
+            'status' => 'available',
+        ]);
+
+        // --- HOSTILE ENVIRONMENT TRAINING ---
+        Service::create([
+            'category_id' => $catTraining->id,
+            'name' => 'Hostile Environment Training Program',
+            'slug' => 'hostile-environment-training',
+            'price' => 12000.00,
+            'description' => 'Comprehensive 5-day training for personnel operating in high-risk zones. Includes first aid, ambush response, and emergency extraction protocols.',
             'status' => 'available',
         ]);
     }

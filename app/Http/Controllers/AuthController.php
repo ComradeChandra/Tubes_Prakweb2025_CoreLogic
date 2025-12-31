@@ -23,6 +23,9 @@ class AuthController extends Controller
         $request->validate([
             'login_identifier' => 'required',
             'password' => 'required'
+        ], [
+            'login_identifier.required' => 'Please provide your email or username.',
+            'password.required' => 'Password is required to proceed.'
         ]);
 
         // 2. Cek ini Email atau Username?
@@ -65,7 +68,7 @@ class AuthController extends Controller
         // Kalo gagal login (password salah atau user gak ada)
         // Balikin lagi ke halaman login
         return back()->withErrors([
-            'login_identifier' => 'Password atau Akun salah bro, coba lagi.',
+            'login_identifier' => 'Invalid credentials. Please check your email/username and password.',
         ]);
     }
 
@@ -82,8 +85,36 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:8|confirmed' // confirmed biar ngecek password sama confirm_password sama
+            'password' => 'required|min:8|confirmed',
+            'nik' => 'required|numeric|digits:16',
+            'id_card' => 'required|image|max:10240', // Max 10MB
+            'country_code' => 'required|string',
+            'phone' => 'required|numeric|digits_between:8,15',
+        ], [
+            'name.required' => 'Please enter your full name.',
+            'name.max' => 'Name must not exceed 255 characters.',
+            'email.required' => 'Please provide a valid email address.',
+            'email.email' => 'The email format is invalid.',
+            'email.unique' => 'This email address is already registered.',
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password requires at least 8 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
+            'nik.required' => 'National ID (NIK) is required.',
+            'nik.digits' => 'NIK must be exactly 16 digits.',
+            'id_card.required' => 'ID Card photo is required.',
+            'id_card.image' => 'File must be an image.',
+            'id_card.max' => 'Image size must not exceed 10MB.',
+            'country_code.required' => 'Please select a country code.',
+            'phone.required' => 'Phone number is required.',
+            'phone.numeric' => 'Phone number must be numeric.',
+            'phone.digits_between' => 'Phone number must be between 8 and 15 digits.'
         ]);
+
+        // Handle File Upload
+        $idCardPath = null;
+        if ($request->hasFile('id_card')) {
+            $idCardPath = $request->file('id_card')->store('id_cards', 'public');
+        }
 
         // Bikin username otomatis (Soalnya di database wajib ada kolom username)
         // Kita ambil dari nama depan email terus tambahin angka random.
@@ -96,13 +127,19 @@ class AuthController extends Controller
         // Gabungin jadi username: contoh "chandra.123"
         $usernameJadi = $namaDepan . "." . $angkaRandom;
 
+        // Gabung country code dan phone
+        $fullPhone = $request->country_code . $request->phone;
+
         // Simpan ke database
         User::create([
             'name' => $request->name,
             'email' => $request->email,
             'username' => $usernameJadi,
-            'password' => Hash::make($request->password), // Jangan lupa di-hash!
-            'role' => 'customer' // Default user biasa
+            'password' => Hash::make($request->password),
+            'nik' => $request->nik,
+            'id_card_path' => $idCardPath,
+            'phone' => $fullPhone,
+            'role' => 'customer'
         ]);
 
         // Langsung login aja biar cepet, gak usah suruh login ulang
@@ -113,7 +150,7 @@ class AuthController extends Controller
         
         Auth::attempt($credentials);
 
-        return redirect('/')->with('success', 'Mantap, udah terdaftar!');
+        return redirect('/')->with('success', 'Registration successful. Welcome aboard!');
     }
 
     // LOGOUT

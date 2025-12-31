@@ -1,132 +1,202 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-Route::get('/tes', function () {
-    return 'ROUTE JALAN';
-});
-
-// Panggil Controller yang dibutuhin
-// Harus dipanggil satu-satu biar jelas asalnya darimana
+// Panggil Controller Auth buat ngatur Login/Logout/Register
 use App\Http\Controllers\AuthController;
-use App\Models\Service; // Ini buat ngambil data service di halaman depan
+// UPDATE: Panggil Model Service biar bisa ambil data Unit buat Katalog
+use App\Models\Service;
+use App\Models\Category; // Tambahin ini biar filter kategori di katalog jalan dinamis
+// CRUD Admin Controllers
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ServiceController; 
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\OrderController; // Controller baru buat handle order
+use App\Http\Controllers\DashboardController; // Controller khusus Dashboard Admin
+use App\Http\Controllers\ProfileController; // Controller Profile User
+use App\Http\Controllers\UserController; // Controller Admin Manage User
 
 /*
 |--------------------------------------------------------------------------
-| Web Routes
+| Web Routes - CORELOGIC DEFENSE
 |--------------------------------------------------------------------------
 |
-| Ini file buat ngatur semua alamat URL yang ada di website ini.
-| Jadi kalau user ngetik alamat apa, laravel bakal cek ke sini dulu.
+| Ini peta jalan aplikasi kita.
+| Di sini urg ngatur: "Kalau user ketik URL ini, laravel harus ngapain?"
 |
 */
 
-// ====================================================
-// HALAMAN PUBLIK (Bisa diakses siapa aja)
-// ====================================================
-
-// 1. Halaman Depan (Landing Page)
-// Arahin ke view layouts.welcome punya Nauval yang desainnya sangar
+// 1. HALAMAN DEPAN (LANDING PAGE)
+// UPDATE: Urg ganti arahnya ke 'layouts.welcome' (Punya Nauval).
+// Biar yang muncul desain Tentara & "Elite Protection", bukan logo Laravel biasa.
 Route::get('/', function () {
     return view('layouts.welcome');
 });
 
-// 2. Halaman Katalog Unit
-// Ini buat nampilin daftar unit keamanan yang kita punya
-Route::get('/catalog', function () {
-    // Ambil semua data service dari database
-    $services = Service::all();
-    
-    // Kirim datanya ke view catalog biar bisa dilooping
-    return view('catalog', compact('services'));
+// 2. HALAMAN KATALOG (DAFTAR UNIT)
+// UPDATE: Ini rute baru buat nampilin halaman Katalog buatan Nauval.
+// Urg arahin ke Controller biar logic search & filternya jalan (jangan pake closure function lagi).
+Route::get('/catalog', [ServiceController::class, 'publicCatalog']);
+
+// 3. SISTEM AUTHENTICATION (LOGIN & REGISTER)
+// Urg kelompokkin pake 'controller' biar rapi, gak perlu ngetik [AuthController::class] berkali-kali.
+Route::controller(AuthController::class)->group(function () {
+
+    // --- HALAMAN LOGIN ---
+    // URL: /login (GET)
+    // Tugas: Nampilin form login Redfor yang tadi urg desain.
+    Route::get('/login', 'showLogin')->name('login');
+
+    // --- PROSES LOGIN ---
+    // URL: /login (POST)
+    // Tugas: Nerima data dari form, terus cek email & password (Validasi).
+    Route::post('/login', 'login')->name('login.post');
+
+    // --- HALAMAN REGISTER ---
+    // URL: /register (GET)
+    Route::get('/register', 'showRegister')->name('register');
+
+    // --- PROSES REGISTER ---
+    // URL: /register (POST)
+    Route::post('/register', 'register')->name('register.post');
+
+    // --- LOGOUT ---
+    Route::post('/logout', 'logout')->name('logout');
 });
-// 3. Halaman Detail Service (Single Service)
-Route::get('/services/{id}', function ($id) {
-    $service = Service::findOrFail($id);
-    return view('services.show', compact('service'));
-});
 
-// ====================================================
-// AUTHENTICATION (LOGIN, REGISTER, LOGOUT)
-// ====================================================
-// Ini sengaja ditulis satu-satu routenya biar gak bingung bacanya.
-
-// --- LOGIN ---
-// Ini route buat nampilin form loginnya
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-
-// Ini route buat proses loginnya (terima data dari form)
-Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-
-// --- REGISTER ---
-// Ini route buat nampilin form daftar akun baru
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-
-// Ini route buat proses simpan data pendaftar baru
-Route::post('/register', [AuthController::class, 'register'])->name('register.post');
-
-// --- LOGOUT ---
-// Pake 'any' biar bisa diakses lewat url langsung (darurat/testing)
-// Jadi kalau tombol logout error, user bisa ketik /logout di browser
-Route::any('/logout', [AuthController::class, 'logout'])->name('logout');
-
-
-// ====================================================
-// ORDER ROUTES (Perlu Login)
-// ====================================================
+// 4. ROUTES UNTUK USER YANG SUDAH LOGIN
+// Protected routes - harus login dulu
 Route::middleware(['auth'])->group(function () {
-    
-    // Proses Submit Order (POST)
-    // Form action di blade harus mengarah ke sini: action="{{ route('orders.store') }}"
-    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 
-    // 4. Halaman Order Service (DIPINDAH KE SINI BIAR GAK BISA DIAKSES GUEST)
-    // [CATATAN CHANDRA]:
-    // Dulu ini di luar middleware 'auth', jadi Guest bisa akses.
-    // Sekarang dimasukin sini biar cuma user login yang bisa buka form order.
-    Route::get('/services/{id}/order', function ($id) {
+    // Detail Service & Form Order
+    Route::get('/services/{id}', function($id) {
+        $service = Service::findOrFail($id);
+        return view('services.show', compact('service'));
+    })->name('services.show');
+
+    Route::get('/services/{id}/order', function($id) {
         $service = Service::findOrFail($id);
         return view('services.order', compact('service'));
-    });
+    })->name('services.order');
 
-    // 5. Halaman History Order User (PRAK-14)
+    Route::post('/services/{id}/order', [OrderController::class, 'store'])->name('orders.store');
+
+    // Halaman History Order User
     Route::get('/my-orders', [OrderController::class, 'history'])->name('orders.history');
+
+    // Route: Show order detail (USER)
+    // Catatan: Pastikan route ini didefinisikan sebelum route PDF yang lebih spesifik
+    Route::get('/my-orders/{order}', [OrderController::class, 'showUser'])->name('orders.show');
+
+    // Export PDF Order User
+    Route::get('/my-orders/{order}/pdf', [OrderController::class, 'exportPdf'])->name('orders.exportPdf');
+
+    // --- USER PROFILE (NEW SPRINT 3) ---
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // Notifications (mark read)
+    Route::post('/notifications/mark-read', [ProfileController::class, 'markNotificationsRead'])->name('notifications.markRead');
 
 });
 
+/*
+========== ADMIN ROUTES - CRUD MANAGEMENT ==========
 
-// ====================================================
-// HALAMAN ADMIN (Cuma bisa diakses User Admin)
-// ====================================================
-// Kita kelompokin pake middleware 'auth' sama 'role:admin'.
-// Jadi kalau user belum login atau bukan admin, bakal ditendang keluar.
+PROTECTED ROUTES (CUMA ADMIN YANG BISA AKSES)
+Semua route di grup ini dilindungi dengan 2 middleware:
+1. 'auth' -> User harus login dulu
+2. 'role:admin' -> User harus punya role 'admin'
+
+Kalau customer atau staff coba akses -> 403 Forbidden
+Kalau belum login -> redirect ke halaman login
+
+RESOURCEFUL ROUTES:
+Route::resource() otomatis generate 7 routes:
+- index()   -> GET    /admin/categories         (List semua kategori)
+- create()  -> GET    /admin/categories/create  (Form tambah kategori)
+- store()   -> POST   /admin/categories         (Proses tambah kategori)
+- show()    -> GET    /admin/categories/{id}    (Detail kategori - not used)
+- edit()    -> GET    /admin/categories/{id}/edit (Form edit kategori)
+- update()  -> PUT    /admin/categories/{id}    (Proses update kategori)
+- destroy() -> DELETE /admin/categories/{id}    (Hapus kategori)
+
+NAMING CONVENTION:
+->names('admin.categories') -> Semua route punya prefix nama 'admin.categories'
+Contoh: route('admin.categories.index'), route('admin.categories.create'), dll
+*/
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
 
     // Halaman Utama Admin (Dashboard)
-    // Nampilin ringkasan data / overview
-    Route::get('/admin', function() {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    // Nampilin ringkasan data / overview dengan stats keuangan
+    Route::get('/admin', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // --- MANAGE KATEGORI UNIT ---
     // Pake resource biar otomatis dapet index, create, store, edit, update, destroy
     // Ini buat ngatur kategori kayak: Combat, Transport, Guard, dll
     Route::resource('admin/categories', CategoryController::class)
          ->names('admin.categories')
-         ->except(['show']); // show gak dipake karena kita gak butuh detail per kategori
+         ->except(['show']); // Gak pakai show() karena list udah cukup
 
-    // --- MANAGE UNIT KEAMANAN (SERVICES) ---
-    // Ini buat CRUD data unitnya (Eastern Wolves, K9 Unit, dll)
+    // ===== CRUD SERVICES (UNIT KEAMANAN) =====
+    // Manage unit keamanan individual (Eastern Wolves, K9, dll)
+    // Include upload foto, set harga, deskripsi, status
+
+    // Route khusus buat hapus foto carousel
+    Route::delete('admin/services/image/{id}', [ServiceController::class, 'destroyImage'])->name('admin.services.image.destroy');
+
     Route::resource('admin/services', ServiceController::class)
          ->names('admin.services')
-         ->except(['show']);
+         ->except(['show']); // Gak pakai show() karena list udah cukup
 
-    // --- MANAGE INCOMING ORDERS (PRAK-15) ---
+    // ===== MANAGE INCOMING ORDERS =====
     // Admin bisa liat list order & update status (Approve/Reject)
     Route::get('admin/orders', [OrderController::class, 'indexAdmin'])->name('admin.orders.index');
     Route::patch('admin/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
+    Route::get('admin/orders/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
+    // --- MANAGE USERS (NEW) ---
+    // Admin bisa liat list user, detail, dan hapus user
+    Route::resource('admin/users', UserController::class)
+         ->names('admin.users')
+         ->only(['index', 'show', 'destroy']);
 
+    // Admin actions for KTP verification
+    // Catatan: Route ini dipakai oleh halaman admin (User details) untuk menandai KTP
+    // sebagai terverifikasi atau tidak. Setelah tindakan, user akan menerima notifikasi
+    // singkat di halaman profil mereka.
+    Route::patch('admin/users/{user}/verify-ktp', [UserController::class, 'verifyKtp'])->name('admin.users.verifyKtp');
+    Route::patch('admin/users/{user}/unverify-ktp', [UserController::class, 'unverifyKtp'])->name('admin.users.unverifyKtp');
+
+    // ===== EXPORT LAPORAN PDF =====
+    // Download laporan penjualan bulanan dalam format PDF
+    Route::get('admin/reports/monthly-sales', [DashboardController::class, 'downloadMonthlySalesReport'])->name('admin.reports.monthly');
 });
+
+/*
+========== CATATAN LOGIKA INTEGRASI (URG) ==========
+
+1. UPDATE FRONTEND NAUVAL:
+   - Rute '/' sekarang ngarah ke `view('layouts.welcome')`. Jadi pas buka web, langsung sangar.
+   - Urg tambahin rute '/catalog'. Di sini urg pake `Service::all()` buat ngambil data REAL
+     dari database (Eastern Wolves, Blackgold, dll) yang kemaren urg seed.
+
+2. SISTEM LOGIN (BACKEND):
+   - Bagian Route::controller(AuthController::class) itu punya urg.
+   - Fungsinya buat ngatur keamanan pintu masuk (Login/Logout).
+   - Logika 'name' ('login.post') tetep dipake biar gampang dipanggil di form view.
+
+3. ADMIN PANEL (NEW):
+   - Rute admin dilindungi middleware auth + role:admin
+   - Resource routes otomatis generate 7 endpoints (index, create, store, edit, update, destroy)
+   - Admin bisa manage Categories dan Services lewat web UI (gak perlu database manual)
+
+4. PENTING:
+   File ini nge-link Frontend (Nauval) sama Backend (Urg).
+   Jadi sekarang Halaman Depan, Katalog, Login, dan Admin Panel udah satu jalur.
+
+5. TESTING ADMIN ACCESS:
+   Login dengan:
+   Email: admin@corelogic.com
+   Password: password
+
+   Setelah login, akses: http://localhost/admin/categories atau /admin/services
+*/

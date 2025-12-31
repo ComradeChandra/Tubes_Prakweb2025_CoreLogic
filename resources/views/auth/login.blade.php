@@ -23,8 +23,8 @@
         <!-- LOGO & BRANDING -->
         <div class="mb-6 text-center">
             <!-- Judul Besar: CoreLogic -->
-            <h1 class="text-3xl font-bold tracking-wider text-white uppercase"> 
-                CoreLogic<spaW class="text-red-600">Security Solutions</span>
+            <h1 class="text-2xl font-bold tracking-wider text-white uppercase"> 
+                CoreLogic <span class="text-red-600">Security Solutions</span>
             </h1>
             <!-- Subjudul: Keliatan profesional, padahal aslinya jualan jasa 'keamanan' -->
             <p class="text-xs text-red-500 tracking-[0.3em] mt-1 font-bold">INTEGRATED SECURITY SYSTEMS</p>
@@ -77,18 +77,20 @@
                         placeholder="••••••••">
                 </div>
 
-                <!-- REMEMBER ME & FORGOT PASSWORD -->
+                <!-- REMEMBER ME -->
                 <div class="flex items-center justify-between mb-6">
                     <label class="flex items-center text-sm text-gray-400 hover:text-gray-300 cursor-pointer">
                         <input type="checkbox" name="remember" class="w-4 h-4 text-red-600 bg-gray-900 border-gray-600 rounded focus:ring-red-600 focus:ring-offset-gray-800">
                         <span class="ml-2">Keep me logged in</span>
                     </label>
                     
-                    <a href="#" class="text-sm text-red-500 hover:text-red-400 transition-colors">Forgot password?</a>
+                    {{-- Forgot password dihapus dulu karena butuh SMTP Server --}}
                 </div>
 
                 <!-- TOMBOL LOGIN -->
                 <button type="submit" 
+                    aria-label="Secure Login Button"
+                    onclick="this.innerHTML='LOGGING IN...'; this.disabled=true; this.form.submit();"
                     class="w-full text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-900 font-bold rounded text-sm px-5 py-3 text-center transition-all tracking-widest uppercase shadow-lg shadow-red-900/50">
                     Secure Login
                 </button>
@@ -119,7 +121,7 @@
 ========== CATATAN PRIBADI (JANGAN DIHAPUS BIAR GAK LUPA) ==========
 
 Ini halaman LOGIN. Urg desain biar keliatan "Corporate" tapi agak gelap (Dark Mode).
-Biar kerasa kalau ini perusahaan serius (isinya jualan jasa PMC/Mercenary).
+Biar kerasa kalau ini perusahaan serius (isinya jualan jasa Keamanan Profesional).
 
 1. KENAPA PAKE 'login_identifier'?
    Di form input, urg kasih name="login_identifier" BUKAN "email".

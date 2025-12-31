@@ -4,6 +4,17 @@
 <section class="bg-gray-900 py-20 min-h-screen">
     <div class="max-w-3xl mx-auto px-6 text-white text-center">
 
+        {{-- TAMPILKAN ERROR FLASH MESSAGE JIKA ADA --}}
+        @if ($errors->any())
+            <div class="mb-6 bg-red-800/80 border border-red-600 text-red-100 rounded p-4 text-left">
+                <ul class="list-disc pl-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <h1 class="text-3xl font-extrabold mb-6">
             Confirm Your Order
         </h1>
@@ -25,18 +36,19 @@
 
         <!-- FORM ORDER (UPDATED BY CHANDRA) -->
         <!-- Action ngarah ke route 'orders.store' buat diproses Backend -->
-        <form action="{{ route('orders.store') }}" method="POST" class="max-w-md mx-auto bg-gray-800 p-6 rounded-lg border border-gray-700">
+        <form action="{{ route('orders.store', $service->id) }}" method="POST" class="max-w-md mx-auto bg-gray-800 p-6 rounded-lg border border-gray-700">
             @csrf <!-- Token Keamanan Wajib -->
             
             <!-- ID Service (Hidden) biar backend tau unit apa yg dibeli -->
             <input type="hidden" name="service_id" value="{{ $service->id }}">
 
-            <!-- Input Quantity -->
-            <div class="mb-4 text-left">
-                <label class="block text-sm font-bold mb-2">Quantity (Personel/Unit)</label>
-                <input type="number" name="quantity" value="1" min="1" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:border-red-500 focus:outline-none">
-            </div>
-
+                        <!-- Input Quantity -->
+                        <div class="mb-4 text-left">
+                            <label class="block text-sm font-bold mb-2">Quantity (Units)</label>
+                            <div class="text-xs text-gray-400 mb-2">{{ $service->unit_description ?? ($service->unit_size . ' personel per unit') }}</div>
+                            <input type="number" name="quantity" value="{{ old('quantity', 1) }}" min="1" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:border-red-500 focus:outline-none">
+                            @error('quantity') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                        </div>
             <!-- Input Date Range (Added by Chandra) -->
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div class="text-left">
@@ -64,11 +76,30 @@
                 </div>
             </div>
 
+            <!-- Input Address & Map -->
+            <div class="mb-4 text-left">
+                <label class="block text-sm font-bold mb-2">Deployment Address</label>
+                <textarea name="address" id="address" rows="2" required class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:border-red-500 focus:outline-none mb-2" placeholder="Full address for unit deployment..."></textarea>
+                
+                <!-- Leaflet Map Container -->
+                <div id="map" class="w-full h-64 rounded border border-gray-600 z-0"></div>
+                <p class="text-xs text-gray-400 mt-1">*Click on the map to pinpoint location.</p>
+                
+                <!-- Hidden Inputs for Coordinates -->
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+            </div>
+
             <!-- Input Notes -->
             <div class="mb-6 text-left">
                 <label class="block text-sm font-bold mb-2">Mission Notes (Optional)</label>
-                <textarea name="notes" rows="3" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:border-red-500 focus:outline-none" placeholder="Specific requirements..."></textarea>
+                <textarea name="notes" rows="3" class="w-full p-2 rounded bg-gray-700 border border-gray-600 text-white focus:border-red-500 focus:outline-none" placeholder="Specific requirements...">{{ old('notes') }}</textarea>
+                @error('notes') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
             </div>
+
+            <!-- Leaflet CSS & JS -->
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
             <!-- SCRIPT VALIDASI & KALKULATOR HARGA -->
             <!-- 
@@ -76,8 +107,57 @@
                 Script ini tugasnya ada 2:
                 1. UX Protection: Mencegah user milih tanggal yang gak masuk akal (Masa lalu / End date sebelum Start date).
                 2. Live Calculator: Biar user tau estimasi harga sebelum kaget pas checkout.
+                3. Map Logic: Nampilin peta dan ambil koordinat.
             -->
             <script>
+                // --- MAP LOGIC ---
+                // Default view: Jakarta (Monas)
+                var map = L.map('map').setView([-6.175392, 106.827153], 13);
+
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map);
+
+                var marker;
+
+                function onMapClick(e) {
+                    // Hapus marker lama kalo ada
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    
+                    // Tambah marker baru
+                    marker = L.marker(e.latlng).addTo(map);
+                    
+                    // Simpan koordinat ke hidden input
+                    document.getElementById('latitude').value = e.latlng.lat;
+                    document.getElementById('longitude').value = e.latlng.lng;
+
+                    // [AUTO-ADDRESS] Reverse Geocoding (Nominatim API)
+                    // Kasih loading text dulu biar user tau lagi mikir
+                    const addressInput = document.getElementById('address');
+                    addressInput.value = "Locating address...";
+                    addressInput.classList.add('animate-pulse');
+
+                    // Fetch ke OpenStreetMap Nominatim
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // Masukin alamat hasil temuan ke textarea
+                            addressInput.value = data.display_name;
+                            addressInput.classList.remove('animate-pulse');
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            addressInput.value = "Address not found. Please type manually.";
+                            addressInput.classList.remove('animate-pulse');
+                        });
+                }
+
+                map.on('click', onMapClick);
+
+                // --- CALCULATOR LOGIC ---
                 const startInput = document.getElementById('start_date');
                 const endInput = document.getElementById('end_date');
                 const qtyInput = document.querySelector('input[name="quantity"]');
